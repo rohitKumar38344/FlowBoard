@@ -1,15 +1,6 @@
-import { Board } from "../Board/Board";
-import { Header } from "../Header/Header";
-import { Sidebar } from "../Sidebar/Sidebar";
+import type { ReactNode } from "react";
 import style from "./Layout.module.css";
 
-export const Layout = () => {
-  return (
-    <div className={style.container}>
-      <Header />
-      <Sidebar />
-      <Board />
-      {/* <div>task area</div> */}
-    </div>
-  );
+export const Layout = ({ children }: { children: ReactNode }) => {
+  return <div className={style.container}>{children}</div>;
 };

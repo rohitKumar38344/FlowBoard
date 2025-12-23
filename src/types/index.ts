@@ -1,13 +1,12 @@
 export interface Board {
   id: string;
   title: string;
-  columns: BoardColumn[];
+  isActive: boolean;
 }
 
-export interface BoardColumn {
+export interface Column {
   id: string;
   title: string;
-  tasks: Task[];
   boardId: string;
 }
 
@@ -16,10 +15,10 @@ export interface Task {
   title: string;
   description: string;
   status: string;
-  subTasks: SubTasks[];
+  columndId: string;
 }
 
-export interface SubTasks {
+export interface Subtask {
   id: string;
   text: string;
   completed: boolean;
