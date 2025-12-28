@@ -1,7 +1,6 @@
 export interface Board {
   id: string;
   title: string;
-  isActive: boolean;
 }
 
 export interface Column {

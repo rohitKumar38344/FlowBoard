@@ -1,40 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { Board, Column } from "../../types";
+import type { Column } from "../../types";
 import type { RootState } from "../../store/store";
+import type { PayloadAction } from "@reduxjs/toolkit";
 
-const columns: Column[] = [
-  {
-    id: "column1",
-    title: "todo",
-    taskIds: ["task1"],
-    boardId: "board1",
-  },
-  {
-    id: "column2",
-    title: "doing",
-    taskIds: ["task1"],
-    boardId: "board1",
-  },
-  {
-    id: "column3",
-    title: "done",
-    taskIds: ["task1"],
-    boardId: "board1",
-  },
-];
+export interface columnState {
+  columns: Column[];
+}
+
+const initialState: columnState = {
+  columns: [],
+}
 
 export const columnsSlice = createSlice({
   name: "columns",
-  initialState: columns,
+  initialState,
   reducers: {
-    // add: (state, action: PayloadAction<Partial<Column>>) => {
-    //   state.push({
-    //     id: crypto.randomUUID(),
-    //     title: action.payload.title!,
-    //     tasks: [],
-    //     boardId: 'alpha',
-    //   })
-    // },
+    addColumn: (state, action: PayloadAction<Column>) => {
+      state.columns.push({
+        ...action.payload
+      })
+    },
     // remove: (state, action: PayloadAction<Partial<Column>>) =>{
     //   state.filter(
     //     (c) =>
@@ -100,12 +85,13 @@ export const columnsSlice = createSlice({
 //     },
 //   },
 // ];
-
+export const {addColumn} = columnsSlice.actions;
 export default columnsSlice.reducer;
-export const selectColumns = (state: RootState) => state.columns;
+export const selectColumns = (state: RootState) => state.columns.columns;
 
 export const selectColumnsByActiveBoard = function (state: RootState) {
-  return (activeBoard: Board) => {
-    return state.columns.filter(col => col.boardId === activeBoard.id)
+  return (activeBoard: string | null) => {
+    if(!activeBoard) return 
+    return state.columns.columns.filter(col => col.boardId === activeBoard)
   };
 };

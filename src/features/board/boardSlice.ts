@@ -1,28 +1,32 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { Board } from "../../types/index.ts";
 import type { RootState } from "../../store/store.ts";
-import type{ PayloadAction } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
 
-const initialState: Board[] = [
-  {
-    id: "board1",
-    title: "Prepare for Interviews",
-    isActive: true,
-    // columnIds: ["column1"],
-  },
-];
+export interface BoardState {
+  boards: Board[],
+  activeBoardId: null | string,
+}
+
+const initialState: BoardState = {
+  boards: [],
+  activeBoardId: null,
+}
 
 export const boardSlice = createSlice({
   name: "board",
   initialState,
   reducers: {
-      add: (state, action: PayloadAction<string>) => {
-        state.push({
-          id: crypto.randomUUID(),
-          title: action.payload,
-          isActive: false,
-        });
-      },
+    addBoard: (state, action: PayloadAction<Board>) => {
+      console.log('state', state)
+      state.boards.push({
+        ...action.payload,
+      });
+      // state.activeBoardId = action.payload.id
+    },
+    activeBoard: (state, action: PayloadAction<string>) => {
+      state.activeBoardId = action.payload;
+    },
     //   remove: (state, action) => {
     //     state.filter((c) => c.id !== action.payload.boardId);
     //   },
@@ -40,8 +44,8 @@ export const boardSlice = createSlice({
   },
 });
 
-export const { add } = boardSlice.actions;
+export const { addBoard, activeBoard } = boardSlice.actions;
 export default boardSlice.reducer;
 
-export const selectBoards = (state: RootState) => state.boards;
-export const selectActiveBoard = (state: RootState) => state.boards.find((b) => b.isActive)!
+export const selectBoards = (state: RootState) => state.boards.boards;
+export const selectActiveBoard = (state: RootState) => state.boards.activeBoardId;

@@ -2,24 +2,17 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { Subtask } from "../../types/index.js";
 import type { RootState } from "../../store/store.js";
 
-const subtasks: Subtask[] = [
-  {
-    id: "subtask1",
-    text: "Learn useEffect hook",
-    completed: true,
-    taskId: "task1",
-  },
-  {
-    id: "subtask2",
-    text: "Learn profiler tool",
-    completed: false,
-    taskId: "task1",
-  },
-];
+export interface SubtaskState {
+  subtasks: Subtask[]
+}
+
+const initialState: SubtaskState = {
+  subtasks: []
+}
 
 export const subtaskSlice = createSlice({
   name: "subtask",
-  initialState: subtasks,
+  initialState,
   reducers: {},
 });
 // export default function subtaskReducer(state = initalState, action) {
@@ -115,16 +108,12 @@ export const subtaskSlice = createSlice({
 //   },
 // ];
 
-// const finalState = actions.reduce(subtaskReducer, initalState);
-
-// console.log(finalState);
-
 export default subtaskSlice.reducer;
 
-export const selectSubtasks = (state: RootState) => state.subtasks;
+export const selectSubtasks = (state: RootState) => state.subtasks.subtasks;
 export const selectSubtasksByTaskId = (state: RootState) => {
   return function (taskId: string){
     console.log('taskid',taskId)
-    return state.subtasks.filter(s => s.taskId === taskId)
+    return state.subtasks.subtasks.filter(s => s.taskId === taskId)
   }
 }

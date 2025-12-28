@@ -2,36 +2,17 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { Task } from "../../types";
 import type { RootState } from "../../store/store";
 
-const tasks: Task[] = [
-  {
-    id: "task1",
-    status: "doing",
-    title: "read docs",
-    description: "react is a js library to build reusable interfaces",
-    subtaskIds: ['subtask1','subtask2'],
-    columndId: 'column1'
-  },
-  {
-    id: "task2",
-    status: "doing",
-    title: "use of mind",
-    description: "react is a js library to build reusable interfaces",
-    subtaskIds: [],
-    columndId: 'column2'
-  },
-  {
-    id: "task3",
-    status: "doing",
-    title: "creating projects",
-    description: "react is a js library to build reusable interfaces",
-    subtaskIds: [],
-    columndId: 'column3'
-  },
-];
+export interface TaskState {
+  tasks: Task[],
+}
+
+const initialState: TaskState = {
+  tasks: [],
+}
 
 export const tasksSlice = createSlice({
   name: 'task',
-  initialState: tasks,
+  initialState,
   reducers: {}
 });
 // export default function taskReducer(state = tasks, action) {
@@ -119,10 +100,10 @@ export const tasksSlice = createSlice({
 // const result = actions.reduce(taskReducer, tasks);
 // console.log(result);
 export default tasksSlice.reducer;
-export const selectTasks = (state: RootState) => state.tasks;
+export const selectTasks = (state: RootState) => state.tasks.tasks;
 export const selectTasksByColumnId = (state: RootState) => {
   return function (columnId: string){
-    return state.tasks.filter(task => task.columndId === columnId)
+    return state.tasks.tasks.filter(task => task.columndId === columnId)
 
   }
 }
