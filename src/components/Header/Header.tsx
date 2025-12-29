@@ -1,10 +1,11 @@
 import { useAppSelector } from "../../types/hooks";
 import style from "./Header.module.css";
-import { selectBoards } from "../../features/board/boardSlice";
+import { selectActiveBoard, selectBoards } from "../../features/board/boardSlice";
 
 export const Header = () => {
-  const boards = useAppSelector(selectBoards);
-  const activeBoard = boards.find((board) => board.isActive);
+  const activeBoardId = useAppSelector(selectActiveBoard);
+  const boards = useAppSelector(selectBoards)
+  const activeBoard = boards.find((board) => board.id === activeBoardId);
 
   return (
     <header className={style.header}>
@@ -12,6 +13,7 @@ export const Header = () => {
       <div>
         <button>+AddNew Task</button>
       </div>
+      <div>⬅️</div>
     </header>
   );
 };
