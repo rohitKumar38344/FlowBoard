@@ -5,7 +5,7 @@ import {
   selectBoards,
 } from "../../features/board/boardSlice.ts";
 import { useAppDispatch, useAppSelector } from "../../types/hooks.ts";
-import style from "./Sidebar.module.css";
+import styles from "./Sidebar.module.css";
 import { addColumn } from "../../features/column/columnsSlice.ts";
 
 export const Sidebar = () => {
@@ -46,14 +46,18 @@ export const Sidebar = () => {
     });
     dispatch(addBoard(newBoard));
     newColumns.forEach((col) => dispatch(addColumn(col)));
+    handleModal();
   }
 
+  function handleModal(){
+    setShowModal((prev) => !prev);
+  }
   return (
-    <div className={style.sidebar}>
+    <div className={styles.sidebar}>
       <h2>🎅Kanban</h2>
       <p>ALL BOARDS {boards?.length | 0}</p>
       {boards && (
-        <div>
+        <div className={styles.boardSidebar}>
           {boards.map((board) => {
             // dispatch an action to mark board active
             return (
@@ -72,6 +76,7 @@ export const Sidebar = () => {
         <button onClick={() => setShowModal(true)}>🚩 +Create New Board</button>
       </div>
       {showModal && (
+        <div className={`${styles.formContainer} ${showModal} ? ${styles.show} : ''}` } onClick={handleModal}>
         <form onSubmit={handleFormSubmit}>
           <p>Add New Board</p>
           <div>
@@ -111,6 +116,7 @@ export const Sidebar = () => {
           />
           <button type="submit">Create New Board</button>
         </form>
+        </div>
       )}
     </div>
   );
