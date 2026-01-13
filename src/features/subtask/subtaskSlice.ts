@@ -3,11 +3,13 @@ import type { Subtask } from "../../types/index.js";
 import type { RootState } from "../../store/store.js";
 
 export interface SubtaskState {
-  subtasks: Subtask[]
+  subtasks: Subtask[],
+  taskId: string | null,
 }
 
 const initialState: SubtaskState = {
-  subtasks: []
+  subtasks: [],
+  taskId: null,
 }
 
 export const subtaskSlice = createSlice({

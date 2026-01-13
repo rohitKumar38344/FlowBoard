@@ -4,10 +4,12 @@ import type { RootState } from "../../store/store";
 
 export interface TaskState {
   tasks: Task[],
+  columnId: string | null
 }
 
 const initialState: TaskState = {
   tasks: [],
+  columnId: null
 }
 
 export const tasksSlice = createSlice({

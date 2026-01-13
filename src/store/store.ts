@@ -1,17 +1,17 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
-import { boardSlice } from "../features/board/boardSlice";
-import { columnsSlice } from "../features/column/columnsSlice";
-import { subtaskSlice } from "../features/subtask/subtaskSlice";
-import { tasksSlice } from "../features/task/tasksSlice";
+import boardReducer from "../features/board/boardSlice";
+import columnReducer from "../features/column/columnsSlice";
+import subtaskReducer from "../features/subtask/subtaskSlice";
+import taskReducer from "../features/task/tasksSlice";
 import { localStorageMiddleware } from "../middlewares/localStorageMiddleware";
 import { getKanbanData } from "../utils/saveToLocalStorage";
 
 const rootReducer = combineReducers({
-  boards: boardSlice.reducer,
-  columns: columnsSlice.reducer,
-  tasks: tasksSlice.reducer,
-  subtasks: subtaskSlice.reducer,
+  boards: boardReducer,
+  columns: columnReducer,
+  tasks: taskReducer,
+  subtasks: subtaskReducer,
 });
 
 export type AppState = ReturnType<typeof rootReducer>;
@@ -27,7 +27,7 @@ export default function getStore(incomingPreloadState?: AppState) {
   return store;
 }
 export const store = getStore(getKanbanData());
-
+// console.log('loaded state', store.getState())
 export type AppStore = typeof store;
 export type RootState = ReturnType<AppStore["getState"]>;
 export type AppDispatch = AppStore["dispatch"];

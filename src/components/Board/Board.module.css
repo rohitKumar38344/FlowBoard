@@ -1,7 +1,17 @@
-.grid {
+/* .grid {
   display: grid;
 }
 
 .grid-cols-3{
   grid-template-columns: repeat(3, 1fr);
+} */
+
+.boardContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.highlight{
+  background-color: green;
+  color: white;
 }
