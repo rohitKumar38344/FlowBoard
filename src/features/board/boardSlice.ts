@@ -39,10 +39,10 @@ export const selectAllBoards = createSelector(
   }
 )
 
-export const selectActiveBoardColumns = createSelector(
+export const selectColumnsForActiveBoard = createSelector(
   [selectActiveBoard, selectColumns],function(board, columns){
     if(!board) return []
     const colIds = board.columnIds;
-    return colIds.map(colId => columns[colId])
+    return colIds.map(colId => columns[colId]).filter(Boolean)// to hadnle partially updated state
   }
 )
