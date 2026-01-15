@@ -1,39 +1,30 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 import type { Task } from "../../types";
 import type { RootState } from "../../store/store";
-import { selectActiveBoard, selectColumnsForActiveBoard } from "../board/boardSlice";
+import { selectColumnsByActiveBoardId } from "../column/columnsSlice";
 
 const initialState = {
-  entities: {}
-}
+  entities: {},
+};
 export const tasksSlice = createSlice({
-  name: 'task',
+  name: "task",
   initialState,
-  reducers: {}
+  reducers: {},
 });
 
 export default tasksSlice.reducer;
 export const selectTasks = (state) => state.tasks.entities;
 export const selectTasksByColumnId = createSelector(
-  [selectColumnsForActiveBoard, selectTasks],
+  [selectColumnsByActiveBoardId, selectTasks],
   function(columns, tasks){
-    if(!columns) return []
-    const map = new Map();
-    console.log('columns',columns)
-    for(let i=0; i<columns.length; i++){
-      const col = columns[i];
-      const taskIds = col.taskIds;
-      map.set(col.title, [])
-      taskIds.forEach(taskId => {
-        map.get(col.title).push(tasks[taskId])
-        
-      })
+    if(!columns) return [];
+    const t = [];
+    for(const col of columns){
+      const tId = col.taskIds;
+      for(const id of tId){
+        t.push(tasks[id]);
+      }
     }
-    // console.log('map',map)
-    return map;
+return t;
   }
 )
-/**
-  
- 
- */

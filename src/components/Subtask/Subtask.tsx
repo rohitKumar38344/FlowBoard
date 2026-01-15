@@ -1,20 +1,29 @@
-import { selectSubtasksByTaskId } from "../../features/subtask/subtaskSlice";
+import { selectSubtasks } from "../../features/subtask/subtaskSlice";
 import { useAppSelector } from "../../types/hooks";
+import { useState,useEffect } from "react";
+// interface SubtaskProps {
+//   taskId: string;
+// }
 
-interface SubtaskProps {
-  taskId: string;
-}
-
-export const Subtask = ({ taskId }: SubtaskProps) => {
-  const subtasks = useAppSelector(selectSubtasksByTaskId)(taskId);
-  console.log(subtasks)
-  const subtasksCompleted = subtasks.reduce(
-    (count, s) => (s.completed ? count + 1 : count),
-    0
-  );
+export const Subtask = ({ subtaskIds }) => {
+  const subtasks = useAppSelector(selectSubtasks);
+  const [t,setT] = useState([]);
+    // console.log('tids',taskIds)
+    useEffect(function (){
+      const nextSubtasks = [];
+      for(let tid of subtaskIds){
+        for(let prop in subtasks){
+          if(prop === tid){
+            nextSubtasks.push(subtasks[tid])
+          }
+        }
+      }
+      setT(nextSubtasks)
+    },[])
+    const taskCompletedCount  = t.filter(task => task.completed).length;
   return (
     <div>
-      {subtasksCompleted} out of {subtasks.length} subtasks
+      <p>{taskCompletedCount} of {t.length} completed tasks</p>
     </div>
   );
 };

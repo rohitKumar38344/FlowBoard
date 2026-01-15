@@ -1,10 +1,19 @@
+.container {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: 96px 1fr;
+  min-height: 100vh;
+  background-color: #333;
+  color: #fff;
+}
+
 .sidebar {
   border: 2px solid rebeccapurple;
 }
 
 .overlay {
-background-color: #F4F4F4;
-position: absolute;
-inset: 0;
-z-index: 99;
+  background-color: #f4f4f4;
+  position: absolute;
+  inset: 0;
+  z-index: 99;
 }

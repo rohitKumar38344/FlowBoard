@@ -4,7 +4,7 @@ import { selectActiveBoard } from "../../features/board/boardSlice";
 
 export const Header = () => {
   const activeBoard = useAppSelector(selectActiveBoard);
-
+// console.log(' header', activeBoard)
   return (
     <header className={style.header}>
       <h2>{activeBoard?.name}</h2>

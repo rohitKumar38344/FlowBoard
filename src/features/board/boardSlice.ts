@@ -1,9 +1,8 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
-import { selectColumns } from "../column/columnsSlice";
 
 const initialState = {
-  activeBoardId: "b1",
   boards: {
+    activeBoardId: "b1",
     entities: {},
   },
 };
@@ -14,7 +13,9 @@ export const boardSlice = createSlice({
 });
 
 export default boardSlice.reducer;
-export const selectActiveBoardId = (state) => state.boards.activeBoardId;
+export const selectActiveBoardId = (state) => {
+  return state.boards.activeBoardId
+};
 const selectBoards = (state) => state.boards.entities;
 
 export const selectActiveBoard = createSelector(
@@ -39,10 +40,10 @@ export const selectAllBoards = createSelector(
   }
 )
 
-export const selectColumnsForActiveBoard = createSelector(
-  [selectActiveBoard, selectColumns],function(board, columns){
-    if(!board) return []
-    const colIds = board.columnIds;
-    return colIds.map(colId => columns[colId]).filter(Boolean)// to hadnle partially updated state
-  }
-)
+// export const selectColumnsForActiveBoard = createSelector(
+//   [selectActiveBoard, selectColumns],function(board, columns){
+//     if(!board) return []
+//     const colIds = board.columnIds;
+//     return colIds.map(colId => columns[colId]).filter(Boolean)// to hadnle partially updated state
+//   }
+// )

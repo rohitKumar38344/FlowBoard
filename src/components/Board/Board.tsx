@@ -1,18 +1,19 @@
-
-
+import { selectColumnsByActiveBoardId } from "../../features/column/columnsSlice";
+import { Column } from "../column/Column";
 import styles from "./Board.module.css";
+import { Fragment } from "react/jsx-runtime";
+import { useAppSelector } from "../../types/hooks";
 // interface BoardsProp {
 //   boards: string[];
 // }
-export const Boards = ({ boards, activeBoardId }) => {
-
+export const Board = () => {
+  const columns = useAppSelector(selectColumnsByActiveBoardId);
+  console.log("columns", columns);
   return (
-    <div className={styles.boardContainer}>
-      {boards.map((board) => {
-        // dispatch an action to mark board active
-        return <button key={board.id}
-          className={`${board.id === activeBoardId} ? ${styles.highlight} : ''`}>⬅️ {board.name}</button>;
-      })}
+    <div>
+      <div >
+          <Column columns={columns} />
+      </div>
     </div>
   );
 };

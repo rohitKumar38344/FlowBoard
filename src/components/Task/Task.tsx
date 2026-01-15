@@ -1,16 +1,32 @@
+import { useEffect, useState } from "react";
+import { useAppSelector } from "../../types/hooks";
+import { selectTasks } from "../../features/task/tasksSlice";
 import { Subtask } from "../Subtask/Subtask";
 
-export const Tasks = ({ tasks }) => {
-  const tasksl = '';
+export const Task = ({ taskIds }) => {
+  const [t,setT] = useState([]);
+  const tasks = useAppSelector(selectTasks);
+  // console.log('tids',taskIds)
+  useEffect(function (){
+    const nextTasks = [];
+    for(let tid of taskIds){
+      for(let prop in tasks){
+        if(prop === tid){
+          nextTasks.push(tasks[tid])
+        }
+      }
+    }
+    setT(nextTasks)
+  },[])
   return (
-    <>
-      {tasks.map((task) => {
-        return <div key={task.id}>
-          {task.title}
-          {/* <Subtask taskId={task.id}/> */}
-        </div>;
-      })}
-    </>
+    <div>
+      {t.map((t) => (
+        <div key={t.id}>
+        <p >{t.title}</p>
+        <Subtask subtaskIds={t.subtaskIds}/>
+</div>
+      ))}
+    </div>
   );
 };
 // new Map([
