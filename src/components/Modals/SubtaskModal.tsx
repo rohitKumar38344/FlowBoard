@@ -28,7 +28,7 @@ export const SubtaskModal = ({ next }) => {
               name="scales"
               checked={subtask.completed}
             />
-            <label for="scales">{subtask.title}</label>
+            <label htmlFor="scales">{subtask.title}</label>
           </div>
         ))}
       </form>

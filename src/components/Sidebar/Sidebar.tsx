@@ -12,7 +12,7 @@ import {
 export const Sidebar = () => {
   const boards = useAppSelector(selectAllBoards);
   const activeBoard = useAppSelector(selectActiveBoard);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(true);
   const [showOverlay, setShowOverlay] = useState(false);
 console.log('boards',boards)
   function handleModal() {
@@ -28,7 +28,7 @@ console.log('boards',boards)
         <p>ALL BOARDS {boards.length}</p>
         <div>
           {boards.map((board) => (
-            <p key={board.id}>{board.name}</p>
+            <p key={board.id} className={`${board.id} == activeBoard.id ? ${styles.highlight} :''`}>{board.name}</p>
           ))}
         </div>
         <button onClick={() => setShowModal(true)}>🚩 +Create New Board</button>
