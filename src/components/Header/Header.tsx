@@ -1,17 +1,19 @@
-import { useAppSelector } from "../../types/hooks";
-import style from "./Header.module.css";
-import { selectActiveBoard } from "../../features/board/boardSlice";
+import { selectActiveBoard } from "../../features/board/boardSlice"
+import { useAppSelector } from "../../types/hooks"
+import { Button } from "../Button"
 
 export const Header = () => {
   const activeBoard = useAppSelector(selectActiveBoard);
-// console.log(' header', activeBoard)
+  if(!activeBoard){
+    return;
+  }
   return (
-    <header className={style.header}>
-      <h2>{activeBoard?.name}</h2>
+    <header className="col-span-2 flex items-center justify-between p-3">
+      <h1 className="font-bold text-xl">{activeBoard.name}</h1>
       <div>
-        <button>+AddNew Task</button>
+        <Button>+ Add New Task</Button>
+        <span >←</span>
       </div>
-      <div>⬅️</div>
     </header>
-  );
-};
+  )
+}

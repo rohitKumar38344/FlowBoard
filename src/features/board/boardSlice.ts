@@ -1,10 +1,8 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  boards: {
     activeBoardId: "b1",
     entities: {},
-  },
 };
 export const boardSlice = createSlice({
   name: "board",

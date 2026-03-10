@@ -1,19 +1,16 @@
+import React from "react";
+import { useAppSelector } from "../../types/hooks";
 import { selectColumnsByActiveBoardId } from "../../features/column/columnsSlice";
 import { Column } from "../column/Column";
-import styles from "./Board.module.css";
-import { Fragment } from "react/jsx-runtime";
-import { useAppSelector } from "../../types/hooks";
-// interface BoardsProp {
-//   boards: string[];
-// }
+
 export const Board = () => {
-  const columns = useAppSelector(selectColumnsByActiveBoardId);
-  console.log("columns", columns);
+  const activeBoardCols = useAppSelector(selectColumnsByActiveBoardId);
+console.log(activeBoardCols)
   return (
-    <div>
-      <div >
-          <Column columns={columns} />
-      </div>
-    </div>
+    <section >
+      {activeBoardCols && (
+        <Column boardColumns={activeBoardCols} />
+      )}
+    </section>
   );
 };

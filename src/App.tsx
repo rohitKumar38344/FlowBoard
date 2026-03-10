@@ -1,15 +1,16 @@
-import "./App.css";
-// import { Columns } from "./components/column/Column";
-// import { Board } from "./components/Board/Board";
+
 import { Header } from "./components/Header/Header";
+import { Layout } from "./components/Layout/Layout";
 import { Sidebar } from "./components/Sidebar/Sidebar";
+import { Board } from "./components/Board/Board";
 
 function App() {
   return (
-    <div>
-      <Header />
-      <Sidebar />
-</div>
+    <Layout>
+      <Header/>
+      <Sidebar/>
+      <Board/>
+    </Layout>
   );
 }
 
