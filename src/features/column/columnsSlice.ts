@@ -8,7 +8,11 @@ const initialState = {
 export const columnsSlice = createSlice({
   name: "columns",
   initialState,
-  reducers: {},
+  reducers: {
+    addColumns: (state, action) => {
+        
+    }
+  },
 });
 
 export default columnsSlice.reducer;
