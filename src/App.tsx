@@ -1,16 +1,5 @@
-import { Header } from "./components/Header/Header";
-import { Layout } from "./components/Layout/Layout";
-
-import { Board } from "./components/Board/Board";
-
 function App() {
-  return (
-    <Layout>
-      <Header />
-      {/* <Sidebar/> */}
-      <Board />
-    </Layout>
-  );
+  return <div>Hi, FlowBoard</div>;
 }
 
 export default App;
