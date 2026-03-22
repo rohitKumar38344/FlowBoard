@@ -1,5 +1,7 @@
+import Layout from "./components/Layout/Layout";
+
 function App() {
-  return <div>Hi, FlowBoard</div>;
+  return <Layout><h1>Hello from redux toolkit</h1></Layout>;
 }
 
 export default App;

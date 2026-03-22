@@ -24,5 +24,5 @@ export const boardSlice = createSlice({
   reducers: {},
 });
 
-export const selectAllBoards = (state: RootState) => state.boards;
+// export const selectAllBoards = (state: RootState) => state.boards;
 export default boardSlice.reducer;
