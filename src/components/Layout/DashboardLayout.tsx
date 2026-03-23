@@ -4,8 +4,9 @@ import { Button } from "../ui/button";
 import { EllipsisVertical } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectActiveBoard } from "@/features/board/boardSlice";
+import { Outlet } from "react-router-dom";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout() {
   const activeBoard = useSelector(selectActiveBoard);
 
   return (
@@ -22,11 +23,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <EllipsisVertical />
               </div>
             </header>
-            {children}
+            <Outlet />
           </main>
         </SidebarProvider>
       ) : (
-        <div className="w-full h-screen grid place-content-center"><Button>+ Create new board</Button></div>
+        <div className="w-full h-screen grid place-content-center">
+          <Button>+ Create new board</Button>
+        </div>
       )}
     </>
   );

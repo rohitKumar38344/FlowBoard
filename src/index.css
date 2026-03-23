@@ -128,3 +128,11 @@
     @apply font-sans;
     }
 }
+
+.active {
+ background-color: #612D53;
+}
+
+.pending {
+ background-color: #2C2C2C;
+}

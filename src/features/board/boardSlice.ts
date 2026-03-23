@@ -4,6 +4,7 @@ import {
   createEntityAdapter,
   createSelector,
   createSlice,
+  type PayloadAction,
 } from "@reduxjs/toolkit";
 
 const boardsAdapter = createEntityAdapter<Board>();
@@ -25,7 +26,11 @@ export const boardSlice = createSlice({
       },
     },
   }),
-  reducers: {},
+  reducers: {
+    boardSelected: (state, action: PayloadAction<string>) =>{
+      state.activeBoardId = action.payload
+    }
+  },
 });
 
 export const selectActiveBoardId = (state: RootState) =>

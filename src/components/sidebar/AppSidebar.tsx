@@ -11,16 +11,26 @@ import { selectAllBoards } from "@/features/board/boardSlice";
 import { useAppSelector } from "@/app/store/hooks";
 import { SquareKanban, Kanban } from "lucide-react";
 import { useMemo } from "react";
+import { NavLink } from "react-router-dom";
+import { isPending } from "@reduxjs/toolkit";
 
 export function AppSidebar() {
   const boards = useAppSelector(selectAllBoards);
   const renderBoards = useMemo(
     () =>
-      Object.values(boards).map((board) => (
-        <Button key={board.id} className="flex-row">
-          <SquareKanban />
-          {board.name}
-        </Button>
+      Object.values(boards).map((board, index) => (
+        <NavLink
+          key={index}
+          to={`/board/${board.id}`}
+          className={({ isActive, isPending }) => {
+            return isActive ? "active" : isPending ? "pending" : "";
+          }}
+        >
+          <Button className="flex-row">
+            <SquareKanban />
+            {board.name}
+          </Button>
+        </NavLink>
       )),
     [boards],
   );

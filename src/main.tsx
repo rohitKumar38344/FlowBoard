@@ -1,14 +1,65 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { App } from "./App.tsx";
 import { Provider } from "react-redux";
 import { store } from "./app/store/store.ts";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import DashboardLayout from "./components/Layout/DashboardLayout.tsx";
+import { Index } from "./index.tsx";
+import { Board } from "./features/board/Board.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <App />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<DashboardLayout />}>
+            <Route index={true} element={<Index />} />
+            <Route path="board/:boardId" element={<Board />}>
+              <Route path="task/:taskId" element={<p>TaskEdit Modal</p>} />
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </Provider>
   </StrictMode>,
 );
+/*
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Root />,
+    errorElement: <ErrorPage />,
+    loader: rootLoader,
+    action: rootAction,
+    children: [
+      {
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            index: true,
+            element: <Index />,
+          },
+          {
+            path: "contacts/:contactId",
+            element: <Contact />,
+            loader: contactLoader,
+            action: contactAction,
+          },
+          {
+            path: "contacts/:contactId/edit",
+            element: <EditContact />,
+            loader: contactLoader,
+            action: editAction,
+          },
+          {
+            path: "contacts/:contactId/destroy",
+            action: destroyAction,
+            errorElement: <div>Oops! There was an error.</div>,
+          },
+        ],
+      },
+    ],
+  },
+]);
+*/
