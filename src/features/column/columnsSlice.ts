@@ -1,4 +1,13 @@
-import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import type { RootState } from "@/app/store/store";
+import {
+  createEntityAdapter,
+
+  createSelector,
+
+  createSlice,
+} from "@reduxjs/toolkit";
+import { selectActiveBoard, selectActiveBoardColumnIds, selectBoardEntities } from "../board/boardSlice";
+
 
 const columnsAdapter = createEntityAdapter();
 
@@ -15,5 +24,12 @@ export const columnsSlice = createSlice({
   }),
   reducers: {},
 });
+
+export const selectColumnsEntities = (state: RootState) => state.columns.entities;
+
+// export const selectAllColumnsFromActiveBoard = createSelector([selectActiveBoardColumnIds, selectBoardEntities], (columnIds, entites)=>{
+//   return columnIds?.map(colId => entites[colId]).filter(Boolean);
+// })
+
 
 export default columnsSlice.reducer;

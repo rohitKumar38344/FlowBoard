@@ -1,3 +1,4 @@
+import type { RootState } from "@/app/store/store";
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 
 const tasksAdapter = createEntityAdapter();
@@ -48,3 +49,5 @@ export const tasksSlice = createSlice({
 });
 
 export default tasksSlice.reducer;
+
+export const selectTaskEntites = (state: RootState) => state.tasks.entities;

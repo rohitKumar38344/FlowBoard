@@ -1,7 +1,10 @@
 import Layout from "./components/Layout/Layout";
+import { Board } from "./features/board/Board";
 
-function App() {
-  return <Layout><h1>Hello from redux toolkit</h1></Layout>;
-}
-
-export default App;
+export const App = () => {
+  return (
+    <Layout>
+      <Board />
+    </Layout>
+  );
+};
