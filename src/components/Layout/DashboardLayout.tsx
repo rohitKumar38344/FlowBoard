@@ -5,10 +5,13 @@ import { EllipsisVertical } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectActiveBoard } from "@/features/board/boardSlice";
 import { Outlet } from "react-router-dom";
+import { useContext } from "react";
+
+import { AddBoardModalContext } from "@/context/AddBoardModalContext";
 
 export default function Layout() {
   const activeBoard = useSelector(selectActiveBoard);
-
+  const { toggleModal } = useContext(AddBoardModalContext)
   return (
     <>
       {activeBoard ? (
@@ -28,7 +31,7 @@ export default function Layout() {
         </SidebarProvider>
       ) : (
         <div className="w-full h-screen grid place-content-center">
-          <Button>+ Create new board</Button>
+          <Button onClick={toggleModal}>+ Create new board</Button>
         </div>
       )}
     </>

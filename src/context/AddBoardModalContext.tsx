@@ -1,3 +1,9 @@
 import { createContext } from "react";
 
-export const AddBoardModalContext = createContext(false);
+type IAddBoardModalContext = {
+  isOpen: boolean;
+  toggleModal?: () => void;
+}
+export const AddBoardModalContext = createContext<IAddBoardModalContext>({
+  isOpen: false,
+});

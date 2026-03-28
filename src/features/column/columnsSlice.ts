@@ -6,7 +6,7 @@ import {
 
   createSlice,
 } from "@reduxjs/toolkit";
-import { selectActiveBoard, selectActiveBoardColumnIds, selectBoardEntities } from "../board/boardSlice";
+import { selectActiveBoard, selectActiveBoardColumnIds, selectActiveBoardId, selectBoardEntities } from "../board/boardSlice";
 
 
 const columnsAdapter = createEntityAdapter();
@@ -22,14 +22,19 @@ export const columnsSlice = createSlice({
       c4: { id: "c4", boardId: "b2", title: "Urgent", taskIds: ["t5"] },
     },
   }),
-  reducers: {},
+  reducers: {
+    columnsAdded: columnsAdapter.addMany,
+  },
 });
 
 export const selectColumnsEntities = (state: RootState) => state.columns.entities;
 
-// export const selectAllColumnsFromActiveBoard = createSelector([selectActiveBoardColumnIds, selectBoardEntities], (columnIds, entites)=>{
-//   return columnIds?.map(colId => entites[colId]).filter(Boolean);
+// export const selectAllColumnTitleByActiveBoard = createSelector([selectActiveBoardId, selectBoardEntities], (activeBoardId, entites)=>{
+//   if(!activeBoardId){
+//     return []
+//   }
+//   const cols = entites[]
 // })
 
-
+export const {columnsAdded} = columnsSlice.actions;
 export default columnsSlice.reducer;

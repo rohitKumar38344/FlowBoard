@@ -10,12 +10,13 @@ import { Button } from "../ui/button";
 import { selectAllBoards } from "@/features/board/boardSlice";
 import { useAppSelector } from "@/app/store/hooks";
 import { SquareKanban, Kanban } from "lucide-react";
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import { NavLink } from "react-router-dom";
-import { isPending } from "@reduxjs/toolkit";
+import { AddBoardModalContext } from "@/context/AddBoardModalContext";
 
 export function AppSidebar() {
   const boards = useAppSelector(selectAllBoards);
+  const { toggleModal } = useContext(AddBoardModalContext);
   const renderBoards = useMemo(
     () =>
       Object.values(boards).map((board, index) => (
@@ -24,7 +25,8 @@ export function AppSidebar() {
           to={`/board/${board.id}`}
           className={({ isActive, isPending }) => {
             return isActive ? "active" : isPending ? "pending" : "";
-          }}
+          }
+        }
         >
           <Button className="flex-row">
             <SquareKanban />
@@ -43,7 +45,10 @@ export function AppSidebar() {
       <p>ALL BOARDS ({renderBoards.length})</p>
       <SidebarContent>
         <SidebarGroup>
-          <ButtonGroup orientation={"vertical"}>{renderBoards}</ButtonGroup>
+          <ButtonGroup orientation={"vertical"}>
+            {renderBoards}
+            <Button onClick={toggleModal}>+ Create New Board</Button>
+          </ButtonGroup>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter />

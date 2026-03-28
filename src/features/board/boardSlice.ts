@@ -29,8 +29,10 @@ export const boardSlice = createSlice({
   reducers: {
     boardSelected: (state, action: PayloadAction<string>) =>{
       state.activeBoardId = action.payload
-    }
+    },
+    boardAdded: boardsAdapter.addOne
   },
+
 });
 
 export const selectActiveBoardId = (state: RootState) =>
@@ -55,4 +57,5 @@ export const selectAllBoards = createSelector(
   (entities) => Object.values(entities),
 );
 
+export const {boardAdded, boardSelected} = boardSlice.actions
 export default boardSlice.reducer;
