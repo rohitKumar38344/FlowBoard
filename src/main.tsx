@@ -7,12 +7,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DashboardLayout from "./components/Layout/DashboardLayout.tsx";
 import { Index } from "./index.tsx";
 import { Board } from "./features/board/Board.tsx";
-import { AddBoardModalProvider } from "./components/Modals/AddBoardModalProvider.tsx";
+import { BoardModalProvider } from "./components/Modals/BoardModalProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <AddBoardModalProvider>
+      <BoardModalProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<DashboardLayout />}>
@@ -23,7 +23,7 @@ createRoot(document.getElementById("root")!).render(
           </Route>
         </Routes>
       </BrowserRouter>
-      </AddBoardModalProvider>
+      </BoardModalProvider>
     </Provider>
   </StrictMode>,
 );

@@ -7,11 +7,12 @@ import { selectActiveBoard } from "@/features/board/boardSlice";
 import { Outlet } from "react-router-dom";
 import { useContext } from "react";
 
-import { AddBoardModalContext } from "@/context/AddBoardModalContext";
+import { AddBoardModalContext, AddTaskModalContext } from "@/context/BoardModalContext";
 
 export default function Layout() {
   const activeBoard = useSelector(selectActiveBoard);
-  const { toggleModal } = useContext(AddBoardModalContext)
+  const { toggleModal } = useContext(AddBoardModalContext);
+  const {showAddTaskForm}= useContext(AddTaskModalContext)
   return (
     <>
       {activeBoard ? (
@@ -22,7 +23,7 @@ export default function Layout() {
             <header className="flex items-center justify-between p-4">
               <h1>{activeBoard.name}</h1>
               <div className="flex gap-2">
-                <Button>+ Add New Task</Button>
+                <Button onClick={showAddTaskForm}>+ Add New Task</Button>
                 <EllipsisVertical />
               </div>
             </header>

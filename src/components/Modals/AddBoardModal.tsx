@@ -46,7 +46,7 @@ export const AddBoardModal = () => {
       }
     })
 console.log('nextColumns', nextColumns)
-    console.log(nextBoard);
+    // console.log(nextBoard);
     // dispatch(boardSelected(nextBoard.id));
     dispatch(boardAdded(nextBoard));
     dispatch(columnsAdded(nextColumns))

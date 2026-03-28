@@ -29,12 +29,18 @@ export const columnsSlice = createSlice({
 
 export const selectColumnsEntities = (state: RootState) => state.columns.entities;
 
-// export const selectAllColumnTitleByActiveBoard = createSelector([selectActiveBoardId, selectBoardEntities], (activeBoardId, entites)=>{
-//   if(!activeBoardId){
-//     return []
-//   }
-//   const cols = entites[]
-// })
+export const selectColumnNamesByActiveBoard = createSelector([selectActiveBoardId,
+  selectColumnsEntities
+], (activeBoardId, entites)=>{
+  if(!activeBoardId){
+    return []
+  }
+  const cols = Object.values(entites)
+  .filter(entity => entity.boardId === activeBoardId)
+  .map(entity => entity.title)
+  .filter(Boolean)
+  return cols;
+})
 
 export const {columnsAdded} = columnsSlice.actions;
 export default columnsSlice.reducer;

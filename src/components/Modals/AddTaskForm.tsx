@@ -1,7 +1,8 @@
-import  { useRef, useState } from "react";
-import type { useParams } from "react-router-dom";
+import  { useState } from "react";
 import "./AddTaskForm.module.css"
-
+import { useAppSelector } from "@/app/store/hooks";
+import { selectColumnNamesByActiveBoard } from "@/features/column/columnsSlice";
+// FIX ACTIVE BOARD ID NOT CHANGING PROBLEM
 /*
 t1: {
         id: "t1",
@@ -19,32 +20,34 @@ s2: {
 */
 export const AddTaskForm = () => {
   // const { boardId } = useParams();
-  const [taskDetails, setTaskDetails] = useState({
-    title: {
-      value: "",
-      errorMessage: "Title must contain atleast 5 chars",
+  const [subtasks, setSubtasks] = useState([
+    {
+      id: crypto.randomUUID(),
+      title: "",
+      
     },
-    description: {
-      value: "",
-      errorMessage: "Description must be between 5 to 100 chars",
+    {
+      id: crypto.randomUUID(),
+      title: "",
+      
     },
-    subtasks: {
-      entities: [
-        {
-          id: crypto.randomUUID(),
-          title: "",
-        },
-        {
-          id: crypto.randomUUID(),
-          title: "",
-        },
-      ],
-      errorMessage: "subtasks must contain at least 10 chars",
-    },
+  ]);
+  const colNames = useAppSelector(selectColumnNamesByActiveBoard)
+  const status = [...colNames]
+  console.log('status',status)
+  function handleAddSubtask(e) {
+    const subtaskId = crypto.randomUUID();
+    const nextSubtask = {
+      id: subtaskId,
+      title: "",
+    };
+    setSubtasks([...subtasks, nextSubtask]);
+  }
 
-    statuses: ["Todo", "Doing", "Done"],
-  });
-  const subtasksIdRef = useRef(3);
+  function handleRemoveSubtask(subtaskId) {
+    if (!subtaskId) return;
+    setSubtasks(subtasks.filter((subtask) => subtask.id !== subtaskId));
+  }
 
   function handleFormSubmit(e: any) {
     e.preventDefault();
@@ -54,7 +57,9 @@ export const AddTaskForm = () => {
     // setTaskDetails()
   }
   return (
-    <form onSubmit={handleFormSubmit} className="max-w-80 rounded-md p-6 flex flex-col gap-4 bg-[#213C51]" >
+    <form onSubmit={handleFormSubmit} className=" p-6 flex flex-col gap-4 bg-[#213C51] absolute top-1/2 left-1/2 -translate-1/2 cursor-default rounded-md z-20"
+    onClick={(e) => e.stopPropagation()}
+    >
       <h1 className="text-[#EEEEEE]">Add New Task</h1>
       <div className="flex flex-col mb-1">
         <label htmlFor="title">Title</label>
@@ -66,6 +71,7 @@ export const AddTaskForm = () => {
           minLength={5}
           maxLength={20}
           className="p-2 rounded-md"
+          defaultValue={''}
         />
       </div>
       <div>
@@ -85,11 +91,11 @@ export const AddTaskForm = () => {
 
       <div>
         <label htmlFor="subtasks">Subtasks</label>
-        {taskDetails.subtasks.entities.map((subtask) => {
+        {subtasks.map((subtask) => {
           return (
             <div key={subtask.id}>
-              <input type="text" name={`subtask-${subtask.id}`} />
-              <span>❌</span>
+              <input type="text" name={`subtask-${subtask.id}`} defaultValue={''}/>
+              <span onClick={() => handleRemoveSubtask(subtask.id)}>❌</span>
             </div>
           );
         })}
@@ -98,8 +104,8 @@ export const AddTaskForm = () => {
 
       <div>
         <label htmlFor="status">Status</label>
-        <select name="status" id="status" data-options>
-          {taskDetails.statuses.map((status, index) => (
+        <select name="status" id="status" data-options defaultValue={status[0] ?? ''}>
+          {status.map((status, index) => (
             <option key={index} value={status} selected={index == 0}>
               {status}
             </option>
