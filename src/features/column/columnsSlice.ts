@@ -1,15 +1,15 @@
 import type { RootState } from "@/app/store/store";
 import {
   createEntityAdapter,
-
   createSelector,
-
   createSlice,
+  type PayloadAction,
 } from "@reduxjs/toolkit";
-import { selectActiveBoard, selectActiveBoardColumnIds, selectActiveBoardId, selectBoardEntities } from "../board/boardSlice";
+import { selectActiveBoardId } from "../board/boardSlice";
+import type { Column, Task } from "@/types";
+import { taskCreated } from "../task/tasksSlice";
 
-
-const columnsAdapter = createEntityAdapter();
+const columnsAdapter = createEntityAdapter<Column>();
 
 export const columnsSlice = createSlice({
   name: "columns",
@@ -25,22 +25,34 @@ export const columnsSlice = createSlice({
   reducers: {
     columnsAdded: columnsAdapter.addMany,
   },
+  extraReducers: (builder) => {
+    builder.addCase(taskCreated, (state, action: PayloadAction<Task>) => {
+      const column = state.entities[action.payload.columnId];
+
+      if (column) {
+        column.taskIds.push(action.payload.id);
+      }
+    });
+  },
 });
 
-export const selectColumnsEntities = (state: RootState) => state.columns.entities;
+export const selectColumnsEntities = (state: RootState) =>
+  state.columns.entities;
 
-export const selectColumnNamesByActiveBoard = createSelector([selectActiveBoardId,
-  selectColumnsEntities
-], (activeBoardId, entites)=>{
-  if(!activeBoardId){
-    return []
-  }
-  const cols = Object.values(entites)
-  .filter(entity => entity.boardId === activeBoardId)
-  .map(entity => entity.title)
-  .filter(Boolean)
-  return cols;
-})
+export const selectColumnsByActiveBoard = createSelector(
+  [selectActiveBoardId, selectColumnsEntities],
+  (activeBoardId, entites) => {
+    console.log("activeboardid", activeBoardId);
+    if (!activeBoardId) {
+      return [];
+    }
+    const cols = Object.values(entites).filter(
+      (entity) => entity.boardId === activeBoardId,
+    );
 
-export const {columnsAdded} = columnsSlice.actions;
+    return cols;
+  },
+);
+
+export const { columnsAdded } = columnsSlice.actions;
 export default columnsSlice.reducer;

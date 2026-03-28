@@ -1,6 +1,6 @@
 import { ColumnList } from "../column/ColumnList";
 import { useAppSelector } from "@/app/store/hooks";
-import { Outlet, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import type { RootState } from "@/app/store/store";
 import { useContext } from "react";
 import { AddBoardModalContext, AddTaskModalContext } from "@/context/BoardModalContext";
@@ -14,7 +14,7 @@ export const Board = () => {
   );
   const { isOpen, toggleModal } = useContext(AddBoardModalContext);
   const {isAddTaskFormOpen, showAddTaskForm} = useContext(AddTaskModalContext)
-  console.log(isAddTaskFormOpen, showAddTaskForm)
+
   if (!activeBoard) return <div>Select a Board</div>;
 
   const columnIds = activeBoard.columnIds;

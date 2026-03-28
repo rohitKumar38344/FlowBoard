@@ -1,7 +1,7 @@
 import { useAppDispatch } from "@/app/store/hooks";
-import { boardAdded, boardSelected } from "@/features/board/boardSlice";
+import { boardAdded } from "@/features/board/boardSlice";
 import { columnsAdded } from "@/features/column/columnsSlice";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 export const AddBoardModal = () => {
   const [columns, setColumns] = useState([
@@ -45,9 +45,7 @@ export const AddBoardModal = () => {
         taskIds: []
       }
     })
-console.log('nextColumns', nextColumns)
-    // console.log(nextBoard);
-    // dispatch(boardSelected(nextBoard.id));
+
     dispatch(boardAdded(nextBoard));
     dispatch(columnsAdded(nextColumns))
   }

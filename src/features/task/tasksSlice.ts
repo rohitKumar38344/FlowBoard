@@ -1,7 +1,8 @@
 import type { RootState } from "@/app/store/store";
-import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import type { Task } from "@/types";
+import { createEntityAdapter, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-const tasksAdapter = createEntityAdapter();
+const tasksAdapter = createEntityAdapter<Task>();
 
 export const tasksSlice = createSlice({
   name: "tasks",
@@ -45,9 +46,15 @@ export const tasksSlice = createSlice({
       },
     },
   }),
-  reducers: {},
+  reducers: {
+    taskCreated: (state, action: PayloadAction<Task>) => {
+      tasksAdapter.addOne(state, action.payload)
+    },
+  },
 });
 
 export default tasksSlice.reducer;
 
 export const selectTaskEntites = (state: RootState) => state.tasks.entities;
+
+export const {taskCreated} = tasksSlice.actions;
