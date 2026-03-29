@@ -7,23 +7,24 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DashboardLayout from "./components/Layout/DashboardLayout.tsx";
 import { Index } from "./index.tsx";
 import { Board } from "./features/board/Board.tsx";
-import { BoardModalProvider } from "./components/Modals/BoardModalProvider.tsx";
+// import { BoardModalProvider } from "./components/Modals/BoardModalProvider.tsx";
+import { ModalProvider } from "./components/Modals/ModalContextProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <BoardModalProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<DashboardLayout />}>
-            <Route index={true} element={<Index />} />
-            <Route path="board/:boardId" element={<Board />}>
-              <Route path="task/:taskId" element={<h2>Task View</h2>} />
+      <ModalProvider>
+         <BrowserRouter>
+           <Routes>
+             <Route path="/" element={<DashboardLayout />}>
+              <Route index={true} element={<Index />} />
+                <Route path="board/:boardId" element={<Board />}>
+                <Route path="task/:taskId" element={<h2>Task View</h2>} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
-      </BoardModalProvider>
+          </Routes>
+        </BrowserRouter>
+      </ModalProvider>
     </Provider>
   </StrictMode>,
 );

@@ -10,34 +10,31 @@ import { Button } from "../ui/button";
 import { boardSelected, selectAllBoards } from "@/features/board/boardSlice";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { SquareKanban, Kanban } from "lucide-react";
-import { useContext, useMemo } from "react";
+import { useContext } from "react";
 import { NavLink } from "react-router-dom";
-import { AddBoardModalContext } from "@/context/BoardModalContext";
+import { ModalContext } from "../../context/ModalContext";
 
 export function AppSidebar() {
   const boards = useAppSelector(selectAllBoards);
   const dispatch = useAppDispatch();
-  const { toggleModal } = useContext(AddBoardModalContext);
-  const renderBoards = Object
-    .values(boards)
-    .map((board, index) => (
-      <NavLink
-        key={index}
-        to={`/board/${board.id}`}
-        className={({ isActive, isPending }) => {
-          return isActive ? "active" : isPending ? "pending" : "";
-        }}
+  const { toggleShowAddBoardModal } = useContext(ModalContext);
+  const renderBoards = Object.values(boards).map((board, index) => (
+    <NavLink
+      key={index}
+      to={`/board/${board.id}`}
+      className={({ isActive, isPending }) => {
+        return isActive ? "active" : isPending ? "pending" : "";
+      }}
+    >
+      <Button
+        className="flex-row"
+        onClick={() => dispatch(boardSelected(board.id))}
       >
-        <Button
-          className="flex-row"
-          onClick={() => dispatch(boardSelected(board.id))}
-        >
-          <SquareKanban />
-          {board.name}
-        </Button>
-      </NavLink>
-    ));
-  
+        <SquareKanban />
+        {board.name}
+      </Button>
+    </NavLink>
+  ));
 
   return (
     <Sidebar>
@@ -50,7 +47,9 @@ export function AppSidebar() {
         <SidebarGroup>
           <ButtonGroup orientation={"vertical"}>
             {renderBoards}
-            <Button onClick={toggleModal}>+ Create New Board</Button>
+            <Button onClick={toggleShowAddBoardModal}>
+              + Create New Board
+            </Button>
           </ButtonGroup>
         </SidebarGroup>
       </SidebarContent>
