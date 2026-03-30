@@ -1,6 +1,7 @@
-import type { RootState } from "@/app/store/store";
+import type { RootState, RootStates } from "@/app/store/store";
 import type { Task } from "@/types";
-import { createEntityAdapter, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createEntityAdapter, createSelector, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { taskMoved } from "../column/columnsSlice";
 
 const tasksAdapter = createEntityAdapter<Task>();
 
@@ -50,11 +51,21 @@ export const tasksSlice = createSlice({
     taskCreated: (state, action: PayloadAction<Task>) => {
       tasksAdapter.addOne(state, action.payload)
     },
+  },extraReducers: (builder) => {
+    builder.addCase(taskMoved, (state, action) => {
+      const {taskId, targetColId} = action.payload;
+      const task = state.entities[taskId];
+      if (task) {
+        task.columnId = targetColId;
+      }
+    });
   },
 });
 
 export default tasksSlice.reducer;
 
 export const selectTaskEntites = (state: RootState) => state.tasks.entities;
+
+export const { selectAll: selectAllTasks, selectById: selectTaskById } = tasksAdapter.getSelectors((state: RootState) => state.tasks);
 
 export const {taskCreated} = tasksSlice.actions;

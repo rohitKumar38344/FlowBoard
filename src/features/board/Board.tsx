@@ -1,6 +1,6 @@
 import { ColumnList } from "../column/ColumnList";
 import { useAppSelector } from "@/app/store/hooks";
-import { useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import type { RootState } from "@/app/store/store";
 
 export const Board = () => {
@@ -17,6 +17,8 @@ export const Board = () => {
       <div className="flex overflow-x-auto p-4 gap-4">
         <ColumnList columnIds={columnIds} />
       </div>
+
+      <Outlet />
     </>
   );
 };

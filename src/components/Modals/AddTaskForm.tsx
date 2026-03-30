@@ -3,16 +3,20 @@ import "./AddTaskForm.module.css";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { selectColumnsByActiveBoard } from "@/features/column/columnsSlice";
 import { taskCreated } from "@/features/task/tasksSlice";
+import type { Subtask } from "@/types";
+import { subtasksAdded } from "@/features/subtask/subtaskSlice";
 
 export const AddTaskForm = () => {
   const [subtasks, setSubtasks] = useState([
     {
       id: crypto.randomUUID(),
       title: "",
+      done: false,
     },
     {
       id: crypto.randomUUID(),
       title: "",
+      done: false,
     },
   ]);
   const columns = useAppSelector(selectColumnsByActiveBoard);
@@ -23,9 +27,11 @@ export const AddTaskForm = () => {
 
   function handleAddSubtask(e) {
     const subtaskId = crypto.randomUUID();
-    const nextSubtask = {
+    const nextSubtask: Subtask = {
       id: subtaskId,
       title: "",
+      done: false,
+      taskId: "",
     };
     setSubtasks([...subtasks, nextSubtask]);
   }
@@ -47,6 +53,13 @@ export const AddTaskForm = () => {
 
     const taskId = crypto.randomUUID();
 
+    const nextSubtasksToAdd = subtasks.map((subtask) => {
+      return {
+        ...subtask,
+        taskId,
+      };
+    });
+
     const nextTask = {
       id: taskId,
       title: data.title,
@@ -54,7 +67,9 @@ export const AddTaskForm = () => {
       columnId: column?.id,
       subtaskIds,
     };
+
     dispatch(taskCreated(nextTask));
+    dispatch(subtasksAdded(nextSubtasksToAdd))
   }
   return (
     <div

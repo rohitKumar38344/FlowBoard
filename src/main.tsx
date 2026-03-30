@@ -7,19 +7,24 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DashboardLayout from "./components/Layout/DashboardLayout.tsx";
 import { Index } from "./index.tsx";
 import { Board } from "./features/board/Board.tsx";
-// import { BoardModalProvider } from "./components/Modals/BoardModalProvider.tsx";
 import { ModalProvider } from "./components/Modals/ModalContextProvider.tsx";
+import ErrorPage from "./pages/ErrorPage.tsx";
+import { TaskViewModal } from "./components/Modals/TaskViewModal.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
       <ModalProvider>
-         <BrowserRouter>
-           <Routes>
-             <Route path="/" element={<DashboardLayout />}>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={<DashboardLayout />}
+              errorElement={<ErrorPage />}
+            >
               <Route index={true} element={<Index />} />
-                <Route path="board/:boardId" element={<Board />}>
-                <Route path="task/:taskId" element={<h2>Task View</h2>} />
+              <Route path="board/:boardId" element={<Board />}>
+                <Route path="task/:taskId" element={<TaskViewModal />} />
               </Route>
             </Route>
           </Routes>
@@ -28,3 +33,5 @@ createRoot(document.getElementById("root")!).render(
     </Provider>
   </StrictMode>,
 );
+
+//http://localhost:5173/board/b1?taskId=83434

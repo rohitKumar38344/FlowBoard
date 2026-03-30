@@ -1,6 +1,8 @@
-import { createSlice, createEntityAdapter } from "@reduxjs/toolkit";
+import { createSlice, createEntityAdapter, type PayloadAction, createSelector } from "@reduxjs/toolkit";
+import type { Subtask } from "@/types";
+import { selectTaskById } from "../task/tasksSlice";
 
-const subtasksAdapter = createEntityAdapter();
+const subtasksAdapter = createEntityAdapter<Subtask>();
 
 export const subtaskSlice = createSlice({
   name: "subtasks",
@@ -17,7 +19,23 @@ export const subtaskSlice = createSlice({
       s3: { id: "s3", taskId: "t3", title: "Write Unit Tests", done: false },
     },
   }),
-  reducers: {},
+  reducers: {
+    subtasksAdded: (state, action: PayloadAction<Subtask[]>) =>{
+      subtasksAdapter.addMany(state,action.payload)
+    },
+    subtaskStatusUpdated: subtasksAdapter.updateOne
+  },
+  
 });
+export const {subtasksAdded} = subtaskSlice.actions
 
+export const selectSubtasksByTaskId = createSelector([
+  (state, taskId) => selectTaskById(state, taskId),
+  (state) => state.subtasks.entities
+],function(task, subtaskEntities){
+  const nextSubtasks = task?.subtaskIds.map(subtaskId => subtaskEntities[subtaskId]) ?? []
+  return nextSubtasks
+})
+
+export const {subtaskStatusUpdated} = subtaskSlice.actions;
 export default subtaskSlice.reducer;
