@@ -1,25 +1,21 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/sidebar/AppSidebar";
-import { Button } from "../ui/button";
-import { EllipsisVertical } from "lucide-react";
-import { useSelector } from "react-redux";
-import { selectActiveBoard } from "@/features/board/boardSlice";
-import { Outlet } from "react-router-dom";
-import { useContext } from "react";
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/sidebar/AppSidebar';
+import { Button } from '../ui/button';
+import { EllipsisVertical } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { selectActiveBoard } from '@/features/board/boardSlice';
+import { Outlet } from 'react-router-dom';
+import { useContext } from 'react';
 
-import { ModalContext } from "../../context/ModalContext";
-import { AddBoardModal } from "../Modals/AddBoardModal";
-import { AddTaskForm } from "../Modals/AddTaskForm";
-import { Modal } from "../Modals/Modal";
+import { ModalContext } from '../../context/ModalContext';
+import { AddBoardModal } from '../Modals/AddBoardModal';
+import { AddTaskForm } from '../Modals/AddTaskForm';
+import { Modal } from '../Modals/Modal';
 
 export default function Layout() {
   const activeBoard = useSelector(selectActiveBoard);
-  const {
-    showAddBoardModal,
-    toggleShowAddBoardModal,
-    showAddTaskModal,
-    toggleShowAddTaskModal,
-  } = useContext(ModalContext);
+  const { showAddBoardModal, toggleShowAddBoardModal, showAddTaskModal, toggleShowAddTaskModal } =
+    useContext(ModalContext);
 
   return (
     <div>

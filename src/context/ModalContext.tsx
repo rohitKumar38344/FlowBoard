@@ -1,6 +1,6 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
-interface IModalContext  {
+interface IModalContext {
   showAddBoardModal: boolean;
   showAddTaskModal: boolean;
   toggleShowAddBoardModal?: () => void;

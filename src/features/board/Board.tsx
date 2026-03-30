@@ -1,13 +1,11 @@
-import { ColumnList } from "../column/ColumnList";
-import { useAppSelector } from "@/app/store/hooks";
-import { Outlet, useParams } from "react-router-dom";
-import type { RootState } from "@/app/store/store";
+import { ColumnList } from '../column/ColumnList';
+import { useAppSelector } from '@/app/store/hooks';
+import { Outlet, useParams } from 'react-router-dom';
+import type { RootState } from '@/app/store/store';
 
 export const Board = () => {
   const { boardId } = useParams<{ boardId: string }>();
-  const activeBoard = useAppSelector(
-    (state: RootState) => state.boards.entities[boardId ?? ""],
-  );
+  const activeBoard = useAppSelector((state: RootState) => state.boards.entities[boardId ?? '']);
 
   if (!activeBoard) return <div>Select a Board</div>;
 

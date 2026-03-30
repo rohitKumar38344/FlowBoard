@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams } from 'react-router-dom';
 
 import {
   Card,
@@ -7,60 +7,32 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import {
-  Field,
-  FieldContent,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "../ui/field";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import {
-  selectSubtasksByTaskId,
-  subtaskStatusUpdated,
-} from "@/features/subtask/subtaskSlice";
-import { selectTaskById } from "@/features/task/tasksSlice";
-import { useMemo } from "react";
-import {
-  selectColumnsByActiveBoard,
-  taskMoved,
-} from "@/features/column/columnsSlice";
+} from '@/components/ui/card';
+import { Field, FieldContent, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../ui/field';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
+import { selectSubtasksByTaskId, subtaskStatusUpdated } from '@/features/subtask/subtaskSlice';
+import { selectTaskById } from '@/features/task/tasksSlice';
+import { useMemo } from 'react';
+import { selectColumnsByActiveBoard, taskMoved } from '@/features/column/columnsSlice';
 
 export const TaskViewModal = () => {
   const { taskId } = useParams();
-  const task = useAppSelector((state) => selectTaskById(state, taskId));
-  const subtasks = useAppSelector((state) =>
-    selectSubtasksByTaskId(state, taskId),
-  );
-  const completed = useMemo(
-    () => subtasks.filter((subtask) => subtask.done),
-    [subtasks],
-  ).length;
+  const task = useAppSelector(state => selectTaskById(state, taskId));
+  const subtasks = useAppSelector(state => selectSubtasksByTaskId(state, taskId));
+  const completed = useMemo(() => subtasks.filter(subtask => subtask.done), [subtasks]).length;
   const columns = useAppSelector(selectColumnsByActiveBoard);
   const dispatch = useAppDispatch();
   const sourceColId = task.columnId;
-  const existingColName = columns.find(
-    (column) => column.id === task.columnId,
-  )?.title;
+  const existingColName = columns.find(column => column.id === task.columnId)?.title;
   function handleChange(targetColumnName: string) {
-    const targetColId = columns.find(
-      (col) => col.title === targetColumnName,
-    )?.id;
+    const targetColId = columns.find(col => col.title === targetColumnName)?.id;
     dispatch(taskMoved({ taskId, sourceColId, targetColId }));
   }
 
   function handleSubtaskStatusChange(nextSubtask) {
-    console.log("nextsubtask", nextSubtask);
+    console.log('nextsubtask', nextSubtask);
     dispatch(subtaskStatusUpdated(nextSubtask));
   }
   return (
@@ -77,13 +49,13 @@ export const TaskViewModal = () => {
           </FieldLegend>
 
           <FieldGroup className="gap-3">
-            {subtasks.map((subtask) => (
+            {subtasks.map(subtask => (
               <Field orientation="horizontal" key={subtask.id}>
                 <Checkbox
                   id={`${subtask.title}-${subtask.id}`}
                   name={subtask.title}
                   defaultChecked={subtask.done}
-                  onCheckedChange={(checked) =>
+                  onCheckedChange={checked =>
                     handleSubtaskStatusChange({
                       id: subtask.id,
                       changes: {
@@ -94,7 +66,7 @@ export const TaskViewModal = () => {
                 />
                 <FieldLabel
                   htmlFor={`${subtask.title}-${subtask.id}`}
-                  className={`font-normal ${subtask.done ? "line-through" : ""}`}
+                  className={`font-normal ${subtask.done ? 'line-through' : ''}`}
                 >
                   {subtask.title}
                 </FieldLabel>

@@ -1,19 +1,19 @@
-import { useAppDispatch } from "@/app/store/hooks";
-import { boardAdded } from "@/features/board/boardSlice";
-import { columnsAdded } from "@/features/column/columnsSlice";
-import { useState } from "react";
+import { useAppDispatch } from '@/app/store/hooks';
+import { boardAdded } from '@/features/board/boardSlice';
+import { columnsAdded } from '@/features/column/columnsSlice';
+import { useState } from 'react';
 
 export const AddBoardModal = () => {
   const [columns, setColumns] = useState([
     {
       id: crypto.randomUUID(),
-      title: "Todo",
-      errorMessage: "column title must contain at least 10 chars",
+      title: 'Todo',
+      errorMessage: 'column title must contain at least 10 chars',
     },
     {
       id: crypto.randomUUID(),
-      title: "Doing",
-      errorMessage: "column title must contain at least 10 chars",
+      title: 'Doing',
+      errorMessage: 'column title must contain at least 10 chars',
     },
   ]);
   const dispatch = useAppDispatch();
@@ -21,17 +21,17 @@ export const AddBoardModal = () => {
     e.preventDefault();
     const formData = Object.fromEntries(new FormData(e.target));
     console.log('formData', formData);
-    const cols = []
-    for(const [key, value] of Object.entries(formData)){
-      if(key.startsWith('column')){
+    const cols = [];
+    for (const [key, value] of Object.entries(formData)) {
+      if (key.startsWith('column')) {
         cols.push({
           id: key.slice(7),
-          title: value
-        })
+          title: value,
+        });
       }
     }
 
-    const nextColumnIds = Array.from(columns, (column) => column.id);
+    const nextColumnIds = Array.from(columns, column => column.id);
     const nextBoard = {
       id: crypto.randomUUID(),
       name: formData.title,
@@ -41,33 +41,33 @@ export const AddBoardModal = () => {
     const nextColumns = cols.map(col => {
       return {
         ...col,
-        boardId : nextBoard.id,
-        taskIds: []
-      }
-    })
+        boardId: nextBoard.id,
+        taskIds: [],
+      };
+    });
 
     dispatch(boardAdded(nextBoard));
-    dispatch(columnsAdded(nextColumns))
+    dispatch(columnsAdded(nextColumns));
   }
 
   function handleAddColumn(e) {
     const columnId = crypto.randomUUID();
     const nextColumn = {
       id: columnId,
-      title: "",
-      errorMessage: "",
+      title: '',
+      errorMessage: '',
     };
     setColumns([...columns, nextColumn]);
   }
 
   function handleRemoveColumn(colId) {
     if (!colId) return;
-    setColumns(columns.filter((column) => column.id !== colId));
+    setColumns(columns.filter(column => column.id !== colId));
   }
   return (
     <div
       className="w-80 absolute top-1/2 left-1/2 -translate-1/2 cursor-default rounded-md bg-green-500 z-20"
-      onClick={(e) => e.stopPropagation()}
+      onClick={e => e.stopPropagation()}
     >
       <form onSubmit={handleFormSubmit} className="p-6 flex flex-col gap-4">
         <h1 className="text-white">Add New Board</h1>
@@ -86,7 +86,7 @@ export const AddBoardModal = () => {
 
         <div className="flex flex-col gap-4">
           <p className=" text-white">Board Columns</p>
-          {columns.map((column) => {
+          {columns.map(column => {
             return (
               <div key={column.id} className="flex gap-1 items-center">
                 <input
@@ -95,10 +95,7 @@ export const AddBoardModal = () => {
                   className="rounded-md p-2"
                   defaultValue={column.title}
                 />
-                <span
-                  onClick={() => handleRemoveColumn(column.id)}
-                  className="cursor-pointer"
-                >
+                <span onClick={() => handleRemoveColumn(column.id)} className="cursor-pointer">
                   ❌
                 </span>
               </div>

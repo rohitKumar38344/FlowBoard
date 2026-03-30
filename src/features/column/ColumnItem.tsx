@@ -1,7 +1,7 @@
-import { useAppSelector } from "@/app/store/hooks";
-import { memo } from "react";
-import { selectColumnsEntities } from "./columnsSlice";
-import { TaskList } from "../task/TaskList";
+import { useAppSelector } from '@/app/store/hooks';
+import { memo } from 'react';
+import { selectColumnsEntities } from './columnsSlice';
+import { TaskList } from '../task/TaskList';
 
 export const ColumnItem = memo(({ columnId, colLen }) => {
   const columns = useAppSelector(selectColumnsEntities);
@@ -13,9 +13,7 @@ export const ColumnItem = memo(({ columnId, colLen }) => {
       <p>
         {column.title} ({colLen})
       </p>
-      {taskIds.length > 0 && taskIds.map((taskId) => (
-        <TaskList key={taskId} taskId={taskId} />
-      ))}
+      {taskIds.length > 0 && taskIds.map(taskId => <TaskList key={taskId} taskId={taskId} />)}
     </div>
   );
 });

@@ -1,27 +1,27 @@
-import { useState } from "react";
-import "./AddTaskForm.module.css";
-import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { selectColumnsByActiveBoard } from "@/features/column/columnsSlice";
-import { taskCreated } from "@/features/task/tasksSlice";
-import type { Subtask } from "@/types";
-import { subtasksAdded } from "@/features/subtask/subtaskSlice";
+import { useState } from 'react';
+import './AddTaskForm.module.css';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
+import { selectColumnsByActiveBoard } from '@/features/column/columnsSlice';
+import { taskCreated } from '@/features/task/tasksSlice';
+import type { Subtask } from '@/types';
+import { subtasksAdded } from '@/features/subtask/subtaskSlice';
 
 export const AddTaskForm = () => {
   const [subtasks, setSubtasks] = useState([
     {
       id: crypto.randomUUID(),
-      title: "",
+      title: '',
       done: false,
     },
     {
       id: crypto.randomUUID(),
-      title: "",
+      title: '',
       done: false,
     },
   ]);
   const columns = useAppSelector(selectColumnsByActiveBoard);
-  console.log("columns", columns);
-  const status = columns.map((column) => column.title);
+  console.log('columns', columns);
+  const status = columns.map(column => column.title);
 
   const dispatch = useAppDispatch();
 
@@ -29,16 +29,16 @@ export const AddTaskForm = () => {
     const subtaskId = crypto.randomUUID();
     const nextSubtask: Subtask = {
       id: subtaskId,
-      title: "",
+      title: '',
       done: false,
-      taskId: "",
+      taskId: '',
     };
     setSubtasks([...subtasks, nextSubtask]);
   }
 
   function handleRemoveSubtask(subtaskId: string) {
     if (!subtaskId) return;
-    setSubtasks(subtasks.filter((subtask) => subtask.id !== subtaskId));
+    setSubtasks(subtasks.filter(subtask => subtask.id !== subtaskId));
   }
 
   function handleFormSubmit(e) {
@@ -46,14 +46,14 @@ export const AddTaskForm = () => {
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
     const subtaskIds = Object.keys(data)
-      .filter((prop) => prop.startsWith("subtask"))
-      .map((subtask) => subtask.slice(8));
+      .filter(prop => prop.startsWith('subtask'))
+      .map(subtask => subtask.slice(8));
 
-    const column = columns.find((column) => column.title === data.status);
+    const column = columns.find(column => column.title === data.status);
 
     const taskId = crypto.randomUUID();
 
-    const nextSubtasksToAdd = subtasks.map((subtask) => {
+    const nextSubtasksToAdd = subtasks.map(subtask => {
       return {
         ...subtask,
         taskId,
@@ -69,12 +69,12 @@ export const AddTaskForm = () => {
     };
 
     dispatch(taskCreated(nextTask));
-    dispatch(subtasksAdded(nextSubtasksToAdd))
+    dispatch(subtasksAdded(nextSubtasksToAdd));
   }
   return (
     <div
       className="w-80 absolute top-1/2 left-1/2 -translate-1/2 cursor-default rounded-md bg-green-500 z-20"
-      onClick={(e) => e.stopPropagation()}
+      onClick={e => e.stopPropagation()}
     >
       <form onSubmit={handleFormSubmit} className=" p-6 flex flex-col gap-4">
         <h1 className="text-[#EEEEEE]">Add New Task</h1>
@@ -88,7 +88,7 @@ export const AddTaskForm = () => {
             minLength={5}
             maxLength={20}
             className="p-2 rounded-md"
-            defaultValue={""}
+            defaultValue={''}
           />
         </div>
         <div>
@@ -103,20 +103,16 @@ export const AddTaskForm = () => {
         "
             minLength={20}
             maxLength={100}
-            defaultValue={""}
+            defaultValue={''}
           ></textarea>
         </div>
 
         <div>
           <label htmlFor="subtasks">Subtasks</label>
-          {subtasks.map((subtask) => {
+          {subtasks.map(subtask => {
             return (
               <div key={subtask.id}>
-                <input
-                  type="text"
-                  name={`subtask-${subtask.id}`}
-                  defaultValue={""}
-                />
+                <input type="text" name={`subtask-${subtask.id}`} defaultValue={''} />
                 <span onClick={() => handleRemoveSubtask(subtask.id)}>❌</span>
               </div>
             );
@@ -128,12 +124,7 @@ export const AddTaskForm = () => {
 
         <div>
           <label htmlFor="status">Status</label>
-          <select
-            name="status"
-            id="status"
-            data-options
-            defaultValue={status[0] ?? ""}
-          >
+          <select name="status" id="status" data-options defaultValue={status[0] ?? ''}>
             {status.map((status, index) => (
               <option key={index} value={status} selected={index == 0}>
                 {status}

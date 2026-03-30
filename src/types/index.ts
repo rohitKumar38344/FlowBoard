@@ -1,7 +1,7 @@
 export interface Board {
   id: string;
   name: string;
-  columnIds: string[]
+  columnIds: string[];
 }
 
 export interface Column {
