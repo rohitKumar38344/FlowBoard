@@ -20,7 +20,7 @@ export const AddTaskForm = () => {
     },
   ]);
   const columns = useAppSelector(selectColumnsByActiveBoard);
-  console.log('columns', columns);
+  // console.log('columns', columns);
   const status = columns.map(column => column.title);
 
   const dispatch = useAppDispatch();
@@ -41,13 +41,19 @@ export const AddTaskForm = () => {
     setSubtasks(subtasks.filter(subtask => subtask.id !== subtaskId));
   }
 
+  function handleSubtaskChange(id: string, value: string) {
+    const subtaskToUpdate = subtasks.find(subtask => subtask.id === id);
+    subtaskToUpdate.title = value;
+    if (subtaskToUpdate) {
+      setSubtasks(subtasks.map(subtask => (subtask.id == id ? subtaskToUpdate : subtask)));
+    }
+  }
   function handleFormSubmit(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
-    const subtaskIds = Object.keys(data)
-      .filter(prop => prop.startsWith('subtask'))
-      .map(subtask => subtask.slice(8));
+    const subtaskIds = subtasks.map(subtask => subtask.id);
+    // console.log(data)
 
     const column = columns.find(column => column.title === data.status);
 
@@ -112,7 +118,12 @@ export const AddTaskForm = () => {
           {subtasks.map(subtask => {
             return (
               <div key={subtask.id}>
-                <input type="text" name={`subtask-${subtask.id}`} defaultValue={''} />
+                <input
+                  type="text"
+                  name={`subtask-${subtask.id}`}
+                  value={subtask.title}
+                  onChange={e => handleSubtaskChange(subtask.id, e.target.value)}
+                />
                 <span onClick={() => handleRemoveSubtask(subtask.id)}>❌</span>
               </div>
             );
@@ -126,7 +137,7 @@ export const AddTaskForm = () => {
           <label htmlFor="status">Status</label>
           <select name="status" id="status" data-options defaultValue={status[0] ?? ''}>
             {status.map((status, index) => (
-              <option key={index} value={status} selected={index == 0}>
+              <option key={index} value={status}>
                 {status}
               </option>
             ))}
