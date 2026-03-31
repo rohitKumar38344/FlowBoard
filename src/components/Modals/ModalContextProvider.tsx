@@ -4,9 +4,11 @@ import { ModalContext } from '../../context/ModalContext';
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [showAddBoardModal, setShowAddBoardModal] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [showEditBoardModal, setShowEditBoardModal] = useState(false);
 
   const toggleShowAddBoardModal = () => setShowAddBoardModal(prev => !prev);
   const toggleShowAddTaskModal = () => setShowAddTaskModal(prev => !prev);
+  const toggleEditBoardModal = () => setShowEditBoardModal(prev => !prev);
   return (
     <ModalContext.Provider
       value={{
@@ -14,6 +16,8 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
         showAddBoardModal,
         toggleShowAddBoardModal,
         toggleShowAddTaskModal,
+        showEditBoardModal,
+        toggleEditBoardModal,
       }}
     >
       {children}

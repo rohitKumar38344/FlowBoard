@@ -5,17 +5,26 @@ import { EllipsisVertical } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { selectActiveBoard } from '@/features/board/boardSlice';
 import { Outlet } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 import { ModalContext } from '../../context/ModalContext';
 import { AddBoardModal } from '../Modals/AddBoardModal';
 import { AddTaskForm } from '../Modals/AddTaskForm';
 import { Modal } from '../Modals/Modal';
+import { EditBoard } from '../Modals/EditBoard';
+import { Card } from '../ui/card';
 
 export default function Layout() {
   const activeBoard = useSelector(selectActiveBoard);
-  const { showAddBoardModal, toggleShowAddBoardModal, showAddTaskModal, toggleShowAddTaskModal } =
-    useContext(ModalContext);
+  const {
+    showAddBoardModal,
+    toggleShowAddBoardModal,
+    showAddTaskModal,
+    toggleShowAddTaskModal,
+    showEditBoardModal,
+    toggleEditBoardModal,
+  } = useContext(ModalContext);
+  const [showEditBoardOption, setShowEditBoardOption] = useState(false);
 
   return (
     <div>
@@ -23,13 +32,19 @@ export default function Layout() {
         <SidebarProvider>
           <AppSidebar />
           <div className="flex flex-1 flex-col ">
-            <header className="flex items-center justify-between p-4">
+            <header className="flex items-center justify-between p-4 relative">
               <SidebarTrigger />
               <h1>{activeBoard.name}</h1>
               <div className="flex gap-2">
                 <Button onClick={toggleShowAddTaskModal}>+ Add New Task</Button>
-                <EllipsisVertical />
+                <EllipsisVertical onClick={() => setShowEditBoardOption(prev => !prev)} />
               </div>
+              {showEditBoardOption && (
+                <Card className="p-4 absolute right-10 top-20">
+                  <Button onClick={toggleEditBoardModal}>Edit Board</Button>
+                  <Button>Delete Board</Button>
+                </Card>
+              )}
             </header>
             <main className="flex-1">
               <Outlet />
@@ -50,6 +65,11 @@ export default function Layout() {
         {showAddTaskModal && (
           <Modal onClose={toggleShowAddTaskModal}>
             <AddTaskForm />
+          </Modal>
+        )}
+        {showEditBoardModal && (
+          <Modal onClose={toggleEditBoardModal}>
+            <EditBoard />
           </Modal>
         )}
       </>

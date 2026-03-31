@@ -5,7 +5,7 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit';
-import { selectActiveBoardId } from '../board/boardSlice';
+import { boardUpdated, selectActiveBoardId } from '../board/boardSlice';
 import type { Column, Task } from '@/types';
 import { taskCreated } from '../task/tasksSlice';
 
@@ -34,15 +34,22 @@ export const columnsSlice = createSlice({
       const targetCol = state.entities[targetColId];
       targetCol?.taskIds.push(taskId);
     },
+    columnsUpdated: columnsAdapter.updateMany,
   },
   extraReducers: builder => {
-    builder.addCase(taskCreated, (state, action: PayloadAction<Task>) => {
-      const column = state.entities[action.payload.columnId];
+    builder
+      .addCase(taskCreated, (state, action: PayloadAction<Task>) => {
+        const column = state.entities[action.payload.columnId];
 
-      if (column) {
-        column.taskIds.push(action.payload.id);
-      }
-    });
+        if (column) {
+          column.taskIds.push(action.payload.id);
+        }
+      })
+      .addCase(boardUpdated, (state, action) => {
+        columnsAdapter.removeMany(state, [action.payload.removedColumnIds]);
+
+        columnsAdapter.upsertMany(state, action.payload.newCols);
+      });
   },
 });
 
@@ -63,5 +70,5 @@ export const selectColumnsByActiveBoard = createSelector(
 export const { selectById: selectColumnById } = columnsAdapter.getSelectors(
   (state: RootState) => state.columns
 );
-export const { columnsAdded, taskMoved } = columnsSlice.actions;
+export const { columnsAdded, taskMoved, columnsUpdated } = columnsSlice.actions;
 export default columnsSlice.reducer;

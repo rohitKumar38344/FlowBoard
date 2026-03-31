@@ -31,7 +31,22 @@ export const boardSlice = createSlice({
       state.activeBoardId = action.payload;
     },
     boardAdded: boardsAdapter.addOne,
+    boardUpdated: (state, action) => {
+      const { boardId, name, newCols } = action.payload;
+      boardsAdapter.updateOne(state, {
+        id: boardId,
+        changes: {
+          name,
+          columnIds: newCols.map(column => column.id),
+        },
+      });
+    },
   },
+  // extraReducers: (builder)=>{
+  //   builder.addCase(boardAdded, (state, action)=>{
+  //     state.activeBoardId = action.payload.id
+  //   })
+  // }
 });
 
 export const selectActiveBoardId = (state: RootState) => state.boards.activeBoardId ?? '';
@@ -54,5 +69,5 @@ export const selectAllBoards = createSelector([selectBoardEntities], entities =>
   Object.values(entities)
 );
 
-export const { boardAdded, boardSelected } = boardSlice.actions;
+export const { boardAdded, boardSelected, boardUpdated } = boardSlice.actions;
 export default boardSlice.reducer;
