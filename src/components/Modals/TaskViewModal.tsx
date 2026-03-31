@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   Card,
@@ -18,7 +18,10 @@ import { useMemo } from 'react';
 import { selectColumnsByActiveBoard, taskMoved } from '@/features/column/columnsSlice';
 
 export const TaskViewModal = () => {
+  const navigate = useNavigate();
   const { taskId } = useParams();
+  const { boardId } = useParams();
+
   const task = useAppSelector(state => selectTaskById(state, taskId));
   const subtasks = useAppSelector(state => selectSubtasksByTaskId(state, taskId));
   const completed = useMemo(() => subtasks.filter(subtask => subtask.done), [subtasks]).length;
@@ -35,69 +38,83 @@ export const TaskViewModal = () => {
     console.log('nextsubtask', nextSubtask);
     dispatch(subtaskStatusUpdated(nextSubtask));
   }
+
+  function handleClose() {
+    navigate(`/board/${boardId}`);
+  }
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{task.title}</CardTitle>
-        <CardDescription>{task.description}</CardDescription>
-        <CardAction>Card Action</CardAction>
-      </CardHeader>
-      <CardContent>
-        <FieldSet>
-          <FieldLegend variant="label">
-            Subtasks ({`${completed} of ${subtasks.length}`})
-          </FieldLegend>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+      onClick={handleClose}
+    >
+      <div
+        className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle>{task.title}</CardTitle>
+            <CardDescription>{task.description}</CardDescription>
+            <CardAction>Card Action</CardAction>
+          </CardHeader>
+          <CardContent>
+            <FieldSet>
+              <FieldLegend variant="label">
+                Subtasks ({`${completed} of ${subtasks.length}`})
+              </FieldLegend>
 
-          <FieldGroup className="gap-3">
-            {subtasks.map(subtask => (
-              <Field orientation="horizontal" key={subtask.id}>
-                <Checkbox
-                  id={`${subtask.title}-${subtask.id}`}
-                  name={subtask.title}
-                  defaultChecked={subtask.done}
-                  onCheckedChange={checked =>
-                    handleSubtaskStatusChange({
-                      id: subtask.id,
-                      changes: {
-                        done: checked,
-                      },
-                    })
-                  }
-                />
-                <FieldLabel
-                  htmlFor={`${subtask.title}-${subtask.id}`}
-                  className={`font-normal ${subtask.done ? 'line-through' : ''}`}
-                >
-                  {subtask.title}
-                </FieldLabel>
-              </Field>
-            ))}
-          </FieldGroup>
-        </FieldSet>
-
-        <FieldGroup className="w-full max-w-xs">
-          <Field orientation="horizontal">
-            <FieldContent>
-              <FieldLabel htmlFor="align-item">Status</FieldLabel>
-            </FieldContent>
-          </Field>
-          <Field>
-            <Select defaultValue={existingColName} onValueChange={handleChange}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {columns.map((column, i) => (
-                  <SelectItem key={i} value={column.title}>
-                    {column.title}
-                  </SelectItem>
+              <FieldGroup className="gap-3">
+                {subtasks.map(subtask => (
+                  <Field orientation="horizontal" key={subtask.id}>
+                    <Checkbox
+                      id={`${subtask.title}-${subtask.id}`}
+                      name={subtask.title}
+                      defaultChecked={subtask.done}
+                      onCheckedChange={checked =>
+                        handleSubtaskStatusChange({
+                          id: subtask.id,
+                          changes: {
+                            done: checked,
+                          },
+                        })
+                      }
+                    />
+                    <FieldLabel
+                      htmlFor={`${subtask.title}-${subtask.id}`}
+                      className={`font-normal ${subtask.done ? 'line-through' : ''}`}
+                    >
+                      {subtask.title}
+                    </FieldLabel>
+                  </Field>
                 ))}
-              </SelectContent>
-            </Select>
-          </Field>
-        </FieldGroup>
-      </CardContent>
-    </Card>
+              </FieldGroup>
+            </FieldSet>
+
+            <FieldGroup className="w-full max-w-xs">
+              <Field orientation="horizontal">
+                <FieldContent>
+                  <FieldLabel htmlFor="align-item">Status</FieldLabel>
+                </FieldContent>
+              </Field>
+              <Field>
+                <Select defaultValue={existingColName} onValueChange={handleChange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {columns.map((column, i) => (
+                      <SelectItem key={i} value={column.title}>
+                        {column.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+            </FieldGroup>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 };
 
