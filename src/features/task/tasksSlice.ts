@@ -1,4 +1,4 @@
-import type { RootState, RootStates } from '@/app/store/store';
+import type { RootState } from '@/app/store/store';
 import type { Task } from '@/types';
 import {
   createEntityAdapter,
@@ -6,7 +6,7 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit';
-import { taskMoved } from '../column/columnsSlice';
+import { taskMoved, taskUpdated } from '../column/columnsSlice';
 
 const tasksAdapter = createEntityAdapter<Task>();
 
@@ -58,20 +58,29 @@ export const tasksSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(taskMoved, (state, action) => {
-      const { taskId, targetColId } = action.payload;
-      const task = state.entities[taskId];
-      if (task) {
-        task.columnId = targetColId;
-      }
-    });
+    builder
+      .addCase(taskMoved, (state, action) => {
+        const { taskId, targetColId } = action.payload;
+        const task = state.entities[taskId];
+        if (task) {
+          task.columnId = targetColId;
+        }
+      })
+      .addCase(taskUpdated, (state, action) => {
+        const { existingTaskId, title, description, draftSubtasks, nextColId } = action.payload;
+        const task = state.entities[existingTaskId];
+        task.title = title;
+        task.description = description;
+        task.subtaskIds = draftSubtasks.map(dStask => dStask.id);
+        task.columnId = nextColId;
+      });
   },
 });
 
 export default tasksSlice.reducer;
-
+// use selectAll from entityAdapter API
 export const selectTaskEntites = (state: RootState) => state.tasks.entities;
-
+// use selectAll from entityAdapter API
 export const { selectAll: selectAllTasks, selectById: selectTaskById } = tasksAdapter.getSelectors(
   (state: RootState) => state.tasks
 );

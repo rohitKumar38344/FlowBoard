@@ -14,8 +14,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import { selectSubtasksByTaskId, subtaskStatusUpdated } from '@/features/subtask/subtaskSlice';
 import { selectTaskById } from '@/features/task/tasksSlice';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { selectColumnsByActiveBoard, taskMoved } from '@/features/column/columnsSlice';
+import { EllipsisVertical } from 'lucide-react';
+import { ModalContext } from '@/context/ModalContext';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '../ui/button';
 
 export const TaskViewModal = () => {
   const navigate = useNavigate();
@@ -29,6 +33,8 @@ export const TaskViewModal = () => {
   const dispatch = useAppDispatch();
   const sourceColId = task.columnId;
   const existingColName = columns.find(column => column.id === task.columnId)?.title;
+  const { toggleEditTaskModal } = useContext(ModalContext);
+
   function handleChange(targetColumnName: string) {
     const targetColId = columns.find(col => col.title === targetColumnName)?.id;
     dispatch(taskMoved({ taskId, sourceColId, targetColId }));
@@ -55,7 +61,18 @@ export const TaskViewModal = () => {
           <CardHeader>
             <CardTitle>{task.title}</CardTitle>
             <CardDescription>{task.description}</CardDescription>
-            <CardAction>Card Action</CardAction>
+            {/* <CardAction> <EllipsisVertical onClick={toggleEditTaskModal} /></CardAction> */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <EllipsisVertical />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-40">
+                <Button onClick={toggleEditTaskModal}>Edit Task</Button>
+                <Button>Delete Task</Button>
+              </PopoverContent>
+            </Popover>
           </CardHeader>
           <CardContent>
             <FieldSet>

@@ -35,6 +35,14 @@ export const columnsSlice = createSlice({
       targetCol?.taskIds.push(taskId);
     },
     columnsUpdated: columnsAdapter.updateMany,
+    taskUpdated: (state, action) => {
+      const { existingColId, existingTaskId, nextColId } = action.payload;
+      const existingColumn = state.entities[existingColId];
+
+      existingColumn.taskIds = existingColumn.taskIds.filter(taskId => taskId !== existingTaskId);
+      const nextColumn = state.entities[nextColId];
+      nextColumn.taskIds.push(existingTaskId);
+    },
   },
   extraReducers: builder => {
     builder
@@ -70,5 +78,5 @@ export const selectColumnsByActiveBoard = createSelector(
 export const { selectById: selectColumnById } = columnsAdapter.getSelectors(
   (state: RootState) => state.columns
 );
-export const { columnsAdded, taskMoved, columnsUpdated } = columnsSlice.actions;
+export const { columnsAdded, taskMoved, columnsUpdated, taskUpdated } = columnsSlice.actions;
 export default columnsSlice.reducer;

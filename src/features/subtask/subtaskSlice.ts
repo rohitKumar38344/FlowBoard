@@ -6,6 +6,8 @@ import {
 } from '@reduxjs/toolkit';
 import type { Subtask } from '@/types';
 import { selectTaskById } from '../task/tasksSlice';
+import type { RootState } from '@/app/store/store';
+import { taskUpdated } from '../column/columnsSlice';
 
 const subtasksAdapter = createEntityAdapter<Subtask>();
 
@@ -29,9 +31,21 @@ export const subtaskSlice = createSlice({
       subtasksAdapter.addMany(state, action.payload);
     },
     subtaskStatusUpdated: subtasksAdapter.updateOne,
+    subtaskMoved: (state, action) => {
+      const { subtaskRemoved, draftSubtasks } = action.payload;
+      subtasksAdapter.removeMany(state, subtaskRemoved);
+      subtasksAdapter.upsertMany(state, draftSubtasks);
+    },
+  },
+  extraReducers: builder => {
+    builder.addCase(taskUpdated, (state, action) => {
+      const { subtasksRemoved, draftSubtasks } = action.payload;
+      subtasksAdapter.removeMany(state, subtasksRemoved);
+      subtasksAdapter.upsertMany(state, draftSubtasks);
+    });
   },
 });
-export const { subtasksAdded } = subtaskSlice.actions;
+export const { subtasksAdded, subtaskMoved } = subtaskSlice.actions;
 
 export const selectSubtasksByTaskId = createSelector(
   [(state, taskId) => selectTaskById(state, taskId), state => state.subtasks.entities],
@@ -42,4 +56,7 @@ export const selectSubtasksByTaskId = createSelector(
 );
 
 export const { subtaskStatusUpdated } = subtaskSlice.actions;
+export const { selectEntities: selectAllSubtasks } = subtasksAdapter.getSelectors(
+  (state: RootState) => state.subtasks
+);
 export default subtaskSlice.reducer;

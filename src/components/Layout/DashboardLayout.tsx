@@ -13,6 +13,7 @@ import { AddTaskForm } from '../Modals/AddTaskForm';
 import { Modal } from '../Modals/Modal';
 import { EditBoard } from '../Modals/EditBoard';
 import { Card } from '../ui/card';
+import { EditTaskModal } from '../Modals/EditTaskModal';
 
 export default function Layout() {
   const activeBoard = useSelector(selectActiveBoard);
@@ -23,6 +24,8 @@ export default function Layout() {
     toggleShowAddTaskModal,
     showEditBoardModal,
     toggleEditBoardModal,
+    showEditTaskModal,
+    toggleEditTaskModal,
   } = useContext(ModalContext);
   const [showEditBoardOption, setShowEditBoardOption] = useState(false);
 
@@ -70,6 +73,11 @@ export default function Layout() {
         {showEditBoardModal && (
           <Modal onClose={toggleEditBoardModal}>
             <EditBoard />
+          </Modal>
+        )}
+        {showEditTaskModal && (
+          <Modal onClose={toggleEditTaskModal}>
+            <EditTaskModal />
           </Modal>
         )}
       </>
