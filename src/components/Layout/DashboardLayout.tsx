@@ -2,8 +2,11 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/sidebar/AppSidebar';
 import { Button } from '../ui/button';
 import { EllipsisVertical } from 'lucide-react';
-import { useSelector } from 'react-redux';
-import { selectActiveBoard } from '@/features/board/boardSlice';
+import {
+  boardDeleted,
+  selectActiveBoard,
+  selectActiveBoardColumnIds,
+} from '@/features/board/boardSlice';
 import { Outlet } from 'react-router-dom';
 import { useContext, useState } from 'react';
 
@@ -14,9 +17,19 @@ import { Modal } from '../Modals/Modal';
 import { EditBoard } from '../Modals/EditBoard';
 import { Card } from '../ui/card';
 import { EditTaskModal } from '../Modals/EditTaskModal';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
+import { selectTaskEntities } from '@/features/task/tasksSlice';
+import { selectAllSubtasks } from '@/features/subtask/subtaskSlice';
+import { selectColumnsByActiveBoard } from '@/features/column/columnsSlice';
+import type { Task } from '@/types';
 
 export default function Layout() {
-  const activeBoard = useSelector(selectActiveBoard);
+  const activeBoard = useAppSelector(selectActiveBoard);
+  const columnIds = useAppSelector(selectActiveBoardColumnIds);
+  const columnsEntites = useAppSelector(selectColumnsByActiveBoard);
+  const allTaskEntities = useAppSelector(selectTaskEntities);
+  const allSubtaskEntities = useAppSelector(selectAllSubtasks);
+
   const {
     showAddBoardModal,
     toggleShowAddBoardModal,
@@ -28,7 +41,33 @@ export default function Layout() {
     toggleEditTaskModal,
   } = useContext(ModalContext);
   const [showEditBoardOption, setShowEditBoardOption] = useState(false);
+  const dispatch = useAppDispatch();
 
+  function handleBoardDelete() {
+    const boardId = activeBoard?.id;
+    if (!boardId) return;
+
+    const colIds = columnIds;
+    const taskIds: string[] = [];
+    const allTasks: Task[] = [];
+    const subtaskIds: string[] = [];
+
+    for (let i = 0; i < columnsEntites.length; i++) {
+      for (const taskId of columnsEntites[i].taskIds) {
+        taskIds.push(allTaskEntities[taskId].id);
+        allTasks.push(allTaskEntities[taskId]);
+      }
+    }
+    for (let i = 0; i < allTasks.length; i++) {
+      for (const subtaskId of allTasks[i].subtaskIds) {
+        subtaskIds.push(allSubtaskEntities[subtaskId].id);
+      }
+    }
+    console.log('taskids', taskIds, subtaskIds);
+    if (boardId) {
+      dispatch(boardDeleted({ boardId, colIds, taskIds, subtaskIds }));
+    }
+  }
   return (
     <div>
       {activeBoard ? (
@@ -45,7 +84,7 @@ export default function Layout() {
               {showEditBoardOption && (
                 <Card className="p-4 absolute right-10 top-20">
                   <Button onClick={toggleEditBoardModal}>Edit Board</Button>
-                  <Button>Delete Board</Button>
+                  <Button onClick={handleBoardDelete}>Delete Board</Button>
                 </Card>
               )}
             </header>

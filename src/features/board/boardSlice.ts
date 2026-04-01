@@ -41,12 +41,20 @@ export const boardSlice = createSlice({
         },
       });
     },
+    boardDeleted: (
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        colIds: string[];
+        taskIds: string[];
+        subtaskIds: string[];
+      }>
+    ) => {
+      const { boardId } = action.payload;
+      boardsAdapter.removeOne(state, boardId);
+      state.activeBoardId = state.ids.pop();
+    },
   },
-  // extraReducers: (builder)=>{
-  //   builder.addCase(boardAdded, (state, action)=>{
-  //     state.activeBoardId = action.payload.id
-  //   })
-  // }
 });
 
 export const selectActiveBoardId = (state: RootState) => state.boards.activeBoardId ?? '';
@@ -69,5 +77,5 @@ export const selectAllBoards = createSelector([selectBoardEntities], entities =>
   Object.values(entities)
 );
 
-export const { boardAdded, boardSelected, boardUpdated } = boardSlice.actions;
+export const { boardAdded, boardSelected, boardUpdated, boardDeleted } = boardSlice.actions;
 export default boardSlice.reducer;

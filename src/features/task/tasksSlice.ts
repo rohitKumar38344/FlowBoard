@@ -7,6 +7,7 @@ import {
   type PayloadAction,
 } from '@reduxjs/toolkit';
 import { taskMoved, taskUpdated } from '../column/columnsSlice';
+import { boardDeleted } from '../board/boardSlice';
 
 const tasksAdapter = createEntityAdapter<Task>();
 
@@ -73,16 +74,22 @@ export const tasksSlice = createSlice({
         task.description = description;
         task.subtaskIds = draftSubtasks.map(dStask => dStask.id);
         task.columnId = nextColId;
+      })
+      .addCase(boardDeleted, (state, action) => {
+        const { taskIds } = action.payload;
+        tasksAdapter.removeMany(state, taskIds);
       });
   },
 });
 
 export default tasksSlice.reducer;
 // use selectAll from entityAdapter API
-export const selectTaskEntites = (state: RootState) => state.tasks.entities;
+// export const selectTaskEntites = (state: RootState) => state.tasks.entities;
 // use selectAll from entityAdapter API
-export const { selectAll: selectAllTasks, selectById: selectTaskById } = tasksAdapter.getSelectors(
-  (state: RootState) => state.tasks
-);
+export const {
+  selectAll: selectAllTasks,
+  selectById: selectTaskById,
+  selectEntities: selectTaskEntities,
+} = tasksAdapter.getSelectors((state: RootState) => state.tasks);
 
 export const { taskCreated } = tasksSlice.actions;

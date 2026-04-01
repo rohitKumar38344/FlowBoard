@@ -8,6 +8,7 @@ import type { Subtask } from '@/types';
 import { selectTaskById } from '../task/tasksSlice';
 import type { RootState } from '@/app/store/store';
 import { taskUpdated } from '../column/columnsSlice';
+import { boardDeleted } from '../board/boardSlice';
 
 const subtasksAdapter = createEntityAdapter<Subtask>();
 
@@ -38,11 +39,16 @@ export const subtaskSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(taskUpdated, (state, action) => {
-      const { subtasksRemoved, draftSubtasks } = action.payload;
-      subtasksAdapter.removeMany(state, subtasksRemoved);
-      subtasksAdapter.upsertMany(state, draftSubtasks);
-    });
+    builder
+      .addCase(taskUpdated, (state, action) => {
+        const { subtasksRemoved, draftSubtasks } = action.payload;
+        subtasksAdapter.removeMany(state, subtasksRemoved);
+        subtasksAdapter.upsertMany(state, draftSubtasks);
+      })
+      .addCase(boardDeleted, (state, action) => {
+        const { subtaskIds } = action.payload;
+        subtasksAdapter.removeMany(state, subtaskIds);
+      });
   },
 });
 export const { subtasksAdded, subtaskMoved } = subtaskSlice.actions;

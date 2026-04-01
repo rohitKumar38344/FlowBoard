@@ -5,7 +5,7 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit';
-import { boardUpdated, selectActiveBoardId } from '../board/boardSlice';
+import { boardDeleted, boardUpdated, selectActiveBoardId } from '../board/boardSlice';
 import type { Column, Task } from '@/types';
 import { taskCreated } from '../task/tasksSlice';
 
@@ -57,6 +57,11 @@ export const columnsSlice = createSlice({
         columnsAdapter.removeMany(state, [action.payload.removedColumnIds]);
 
         columnsAdapter.upsertMany(state, action.payload.newCols);
+      })
+      .addCase(boardDeleted, (state, action) => {
+        const { colIds } = action.payload;
+
+        columnsAdapter.removeMany(state, colIds);
       });
   },
 });
