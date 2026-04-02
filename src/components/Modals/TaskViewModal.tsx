@@ -13,7 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import { selectSubtasksByTaskId, subtaskStatusUpdated } from '@/features/subtask/subtaskSlice';
-import { selectTaskById } from '@/features/task/tasksSlice';
+import { selectTaskById, taskDeleted } from '@/features/task/tasksSlice';
 import { useContext, useMemo } from 'react';
 import { selectColumnsByActiveBoard, taskMoved } from '@/features/column/columnsSlice';
 import { EllipsisVertical } from 'lucide-react';
@@ -48,6 +48,16 @@ export const TaskViewModal = () => {
   function handleClose() {
     navigate(`/board/${boardId}`);
   }
+
+  function handleTaskDelete() {
+    dispatch(
+      taskDeleted({
+        taskId,
+        subtaskIds: task.subtaskIds,
+      })
+    );
+  }
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
@@ -70,7 +80,7 @@ export const TaskViewModal = () => {
               </PopoverTrigger>
               <PopoverContent align="start" className="w-40">
                 <Button onClick={toggleEditTaskModal}>Edit Task</Button>
-                <Button>Delete Task</Button>
+                <Button onClick={handleTaskDelete}>Delete Task</Button>
               </PopoverContent>
             </Popover>
           </CardHeader>

@@ -57,6 +57,10 @@ export const tasksSlice = createSlice({
     taskCreated: (state, action: PayloadAction<Task>) => {
       tasksAdapter.addOne(state, action.payload);
     },
+    taskDeleted: (state, action) => {
+      const { taskId } = action.payload;
+      tasksAdapter.removeOne(state, taskId);
+    },
   },
   extraReducers: builder => {
     builder
@@ -92,4 +96,4 @@ export const {
   selectEntities: selectTaskEntities,
 } = tasksAdapter.getSelectors((state: RootState) => state.tasks);
 
-export const { taskCreated } = tasksSlice.actions;
+export const { taskCreated, taskDeleted } = tasksSlice.actions;

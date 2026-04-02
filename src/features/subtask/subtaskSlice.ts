@@ -5,7 +5,7 @@ import {
   createSelector,
 } from '@reduxjs/toolkit';
 import type { Subtask } from '@/types';
-import { selectTaskById } from '../task/tasksSlice';
+import { selectTaskById, taskDeleted } from '../task/tasksSlice';
 import type { RootState } from '@/app/store/store';
 import { taskUpdated } from '../column/columnsSlice';
 import { boardDeleted } from '../board/boardSlice';
@@ -47,6 +47,11 @@ export const subtaskSlice = createSlice({
       })
       .addCase(boardDeleted, (state, action) => {
         const { subtaskIds } = action.payload;
+        subtasksAdapter.removeMany(state, subtaskIds);
+      })
+      .addCase(taskDeleted, (state, action) => {
+        const { subtaskIds } = action.payload;
+
         subtasksAdapter.removeMany(state, subtaskIds);
       });
   },
