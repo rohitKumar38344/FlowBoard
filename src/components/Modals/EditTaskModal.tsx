@@ -1,80 +1,118 @@
-import { useState } from 'react';
-import { Card, CardHeader, CardTitle } from '../ui/card';
-import { Field, FieldContent, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../ui/field';
+import { useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from '../ui/field';
 import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
 import { XIcon } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import { useParams } from 'react-router-dom';
 import { selectTaskById } from '@/features/task/tasksSlice';
 import { selectAllSubtasks } from '@/features/subtask/subtaskSlice';
 import { Button } from '../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 import { selectColumnsByActiveBoard, taskUpdated } from '@/features/column/columnsSlice';
 import { useModal } from '@/hooks/useModal';
+import * as z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import {
+  InputGroup,
+  InputGroupTextarea,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroupInput,
+  InputGroupButton,
+} from '../ui/input-group';
+import { nanoid } from '@reduxjs/toolkit';
 
+const editTaskSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(1, 'Title is required')
+    .max(100, 'Title must be under 20 characters'),
+  description: z.string().trim().max(400, 'Description is too long'),
+  subtasks: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string().trim().min(1, 'Title is required').max(100, 'Title is too long'),
+      done: z.boolean(),
+    })
+  ),
+  selectedColumn: z.string(),
+});
 export const EditTaskModal = () => {
   const { closeModal } = useModal();
   const { taskId } = useParams();
   const dispatch = useAppDispatch();
   const task = useAppSelector(state => selectTaskById(state, taskId));
-  const [taskName, setTaskName] = useState(task.title);
-  const [description, setDescription] = useState(task.description);
+
   const subtasksMap = useAppSelector(state => selectAllSubtasks(state));
   const subtasks = task.subtaskIds.map(subtaskId => subtasksMap[subtaskId]).filter(Boolean);
-  const [draftSubtasks, setDraftSubtasks] = useState(subtasks);
+
   const columns = useAppSelector(selectColumnsByActiveBoard);
   // column
   const currentColumnStatus = columns.find(column => column.id === task.columnId);
-  const [subtasksRemoved, setSubtaskRemoved] = useState<string[]>([]);
-  // refers to board column eg Todo, Doing
-  const [taskStatus, setTaskStatus] = useState(currentColumnStatus.title);
 
-  function remove(subtaskId: string) {
-    setDraftSubtasks(prevDraftSubtasks =>
-      prevDraftSubtasks.filter(draftSubtask => draftSubtask.id !== subtaskId)
-    );
+  const subtasksRemovedIdRef = useRef<string[]>([]);
 
-    setSubtaskRemoved(prevRemovedSubtasks => [...prevRemovedSubtasks, subtaskId]);
+  const form = useForm<z.infer<typeof editTaskSchema>>({
+    resolver: zodResolver(editTaskSchema),
+    defaultValues: {
+      title: task.title,
+      description: task.description,
+      subtasks,
+      selectedColumn: currentColumnStatus?.title,
+    },
+  });
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'subtasks',
+  });
+  function handleRemoveSubtask(index: number, subtaskId: string) {
+    remove(index);
+    subtasksRemovedIdRef.current.push(subtaskId);
   }
-  function append() {
+  function handleAddSubtask() {
     const nextSubtask = {
-      id: crypto.randomUUID(),
+      id: nanoid(),
       taskId: taskId,
       title: '',
       done: false,
     };
-    setDraftSubtasks(prevStasks => [...prevStasks, nextSubtask]);
-  }
-  function handleSubtaskChange(subtaskId: string, value: string) {
-    setDraftSubtasks(
-      draftSubtasks.map(stask => {
-        if (stask.id === subtaskId) {
-          return {
-            ...stask,
-            title: value,
-          };
-        } else {
-          return stask;
-        }
-      })
-    );
+    append(nextSubtask);
   }
 
-  function handleTaskStatusChange(value: string) {
-    setTaskStatus(value);
-  }
-
-  function handleFormSubmit(e) {
-    e.preventDefault();
+  function onSubmit(data: z.infer<typeof editTaskSchema>) {
+    console.log('data', data);
+    const nextColumn = columns.find(column => column.title === data.selectedColumn);
+    if (!nextColumn) {
+      console.error('Selected column not found');
+      return;
+    }
     const taskToUpdate = {
       existingTaskId: task.id,
-      title: taskName,
-      description,
-      draftSubtasks,
-      subtasksRemoved,
+      title: data.title,
+      description: data.description,
+      draftSubtasks: data.subtasks,
+      subtasksRemoved: subtasksRemovedIdRef.current,
       existingColId: task.columnId,
-      nextColId: columns.find(column => column.title === taskStatus).id,
+      nextColId: nextColumn.id,
     };
     dispatch(taskUpdated(taskToUpdate));
     closeModal();
@@ -84,69 +122,139 @@ export const EditTaskModal = () => {
       <CardHeader className="border-b">
         <CardTitle>Edit Task</CardTitle>
       </CardHeader>
-      <form onSubmit={handleFormSubmit}>
-        <Field>
-          <FieldLabel htmlFor="name">Task Name</FieldLabel>
-          <Input
-            type="text"
-            minLength={5}
-            maxLength={40}
-            id="name"
-            onChange={e => setTaskName(e.target.value)}
-            value={taskName}
-          />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="description">Description</FieldLabel>
-          <Textarea
-            id="description"
-            placeholder="I'm a software engineer..."
-            className="min-h-[120px]"
-            onChange={e => setDescription(e.target.value)}
-            value={description}
-          />
-        </Field>
-        <FieldSet className="gap-4">
-          <FieldLegend variant="label">Subtasks</FieldLegend>
-          <FieldGroup className="gap-4">
-            {draftSubtasks.map(subtask => (
-              <Field orientation="horizontal" key={subtask.id}>
-                <FieldContent>
+      <CardContent>
+        <form onSubmit={form.handleSubmit(onSubmit)} id="addtask-form">
+          <FieldGroup>
+            <Controller
+              name="title"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="title">Title</FieldLabel>
                   <Input
-                    type="text"
-                    name=""
-                    id=""
-                    value={subtask.title}
-                    onChange={e => handleSubtaskChange(subtask.id, e.target.value)}
+                    id="title"
+                    {...field}
+                    placeholder="e.g. Take coffee break"
+                    aria-invalid={fieldState.invalid}
+                    value={field.value}
                   />
-                  <XIcon onClick={() => remove(subtask.id)} />
-                </FieldContent>
-              </Field>
-            ))}
-            <Button type="button" variant="outline" size="sm" onClick={() => append()}>
-              Add Subtask
-            </Button>
-          </FieldGroup>
-        </FieldSet>
-        <FieldSet>
-          <FieldLegend>Current Status</FieldLegend>
-          <Field>
-            <Select onValueChange={handleTaskStatusChange} defaultValue={taskStatus}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {columns.map((column, i) => (
-                  <SelectItem key={i} value={column.title}>
-                    {column.title}
-                  </SelectItem>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+            <Controller
+              name="description"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel data-invalid={fieldState.invalid} htmlFor="description">
+                    Description
+                  </FieldLabel>
+                  <InputGroup>
+                    <InputGroupTextarea
+                      {...field}
+                      id="description"
+                      placeholder="e.g. It's always good to take a break"
+                      rows={6}
+                      className="min-h-24 resize-none"
+                      aria-invalid={fieldState.invalid}
+                      value={field.value}
+                    />
+                    <InputGroupAddon align="block-end">
+                      <InputGroupText className="tabular-nums">
+                        {field.value.length}/400 characters
+                      </InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
+
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+
+            <FieldSet>
+              <FieldLegend variant="label">Subtasks</FieldLegend>
+              <FieldDescription>Add upto 5 Subtasks</FieldDescription>
+              <FieldGroup>
+                {fields.map((field, index) => (
+                  <Controller
+                    key={field.id}
+                    name={`subtasks.${index}.title`}
+                    control={form.control}
+                    render={({ field: controllerField, fieldState }) => (
+                      <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+                        <FieldContent>
+                          <InputGroup>
+                            <InputGroupInput
+                              {...controllerField}
+                              id={`subtask-${field.id}`}
+                              aria-invalid={fieldState.invalid}
+                              value={controllerField.value}
+                            />
+                            {fields.length > 1 && (
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupButton
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon-xs"
+                                  onClick={() => handleRemoveSubtask(index, field.id)}
+                                  aria-label={`Remove subtask ${index + 1}`}
+                                >
+                                  <XIcon />
+                                </InputGroupButton>
+                              </InputGroupAddon>
+                            )}
+                          </InputGroup>
+                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </FieldContent>
+                      </Field>
+                    )}
+                  />
                 ))}
-              </SelectContent>
-            </Select>
-          </Field>
-        </FieldSet>
-        <Button type="submit">Save Edit</Button>
-      </form>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddSubtask}
+                  disabled={fields.length >= 5}
+                  className="w-full"
+                >
+                  + Add New Subtask
+                </Button>
+              </FieldGroup>
+            </FieldSet>
+            <FieldSet>
+              <FieldLegend>Status</FieldLegend>
+              <Controller
+                name="selectedColumn"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="w-full max-w-48">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {columns.map((column, i) => (
+                            <SelectItem value={column.title} key={i}>
+                              {column.title}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+              <Field>
+                <Button type="submit">Create Task</Button>
+              </Field>
+            </FieldSet>
+          </FieldGroup>
+        </form>
+      </CardContent>
     </Card>
   );
 };

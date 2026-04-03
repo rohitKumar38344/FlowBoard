@@ -42,8 +42,12 @@ import {
 import { toast } from 'sonner';
 
 const addTaskSchema = z.object({
-  title: z.string().trim().min(1, 'Title is required').max(20, 'Title must be under 20 characters'),
-  description: z.string().trim().max(500, 'Description is too long'),
+  title: z
+    .string()
+    .trim()
+    .min(1, 'Title is required')
+    .max(100, 'Title must be under 20 characters'),
+  description: z.string().trim().max(400, 'Description is too long'),
   status: z.string().trim().min(1, 'Status is required'),
   subtasks: z.array(
     z.object({
@@ -87,7 +91,7 @@ export const AddTaskForm = () => {
   const dispatch = useAppDispatch();
 
   function handleAddSubtask() {
-    const subtaskId = crypto.randomUUID();
+    const subtaskId = nanoid();
     const nextSubtask: Subtask = {
       id: subtaskId,
       title: '',
@@ -184,7 +188,7 @@ export const AddTaskForm = () => {
                     />
                     <InputGroupAddon align="block-end">
                       <InputGroupText className="tabular-nums">
-                        {field.value.length}/100 characters
+                        {field.value.length}/400 characters
                       </InputGroupText>
                     </InputGroupAddon>
                   </InputGroup>
