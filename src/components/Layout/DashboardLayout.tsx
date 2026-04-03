@@ -8,9 +8,9 @@ import {
   selectActiveBoardColumnIds,
 } from '@/features/board/boardSlice';
 import { Outlet } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
-import { ModalContext } from '../../context/ModalContext';
+import { useModal } from '@/hooks/useModal';
 import { AddBoardModal } from '../Modals/AddBoardModal';
 import { AddTaskForm } from '../Modals/AddTaskForm';
 import { Modal } from '../Modals/Modal';
@@ -30,16 +30,7 @@ export default function Layout() {
   const allTaskEntities = useAppSelector(selectTaskEntities);
   const allSubtaskEntities = useAppSelector(selectAllSubtasks);
 
-  const {
-    showAddBoardModal,
-    toggleShowAddBoardModal,
-    showAddTaskModal,
-    toggleShowAddTaskModal,
-    showEditBoardModal,
-    toggleEditBoardModal,
-    showEditTaskModal,
-    toggleEditTaskModal,
-  } = useContext(ModalContext);
+  const { activeModal, closeModal, openModal } = useModal();
   const [showEditBoardOption, setShowEditBoardOption] = useState(false);
   const dispatch = useAppDispatch();
 
@@ -47,7 +38,7 @@ export default function Layout() {
     const boardId = activeBoard?.id;
     if (!boardId) return;
 
-    const colIds = columnIds;
+    const colIds = columnIds ?? [];
     const taskIds: string[] = [];
     const allTasks: Task[] = [];
     const subtaskIds: string[] = [];
@@ -68,6 +59,14 @@ export default function Layout() {
       dispatch(boardDeleted({ boardId, colIds, taskIds, subtaskIds }));
     }
   }
+
+  const Modal_Components: Record<string, ReactNode> = {
+    ADD_BOARD: <AddBoardModal />,
+    EDIT_BOARD: <EditBoard />,
+    ADD_TASK: <AddTaskForm />,
+    EDIT_TASK: <EditTaskModal />,
+  };
+
   return (
     <div>
       {activeBoard ? (
@@ -78,12 +77,12 @@ export default function Layout() {
               <SidebarTrigger />
               <h1>{activeBoard.name}</h1>
               <div className="flex gap-2">
-                <Button onClick={toggleShowAddTaskModal}>+ Add New Task</Button>
+                <Button onClick={() => openModal('ADD_TASK')}>+ Add New Task</Button>
                 <EllipsisVertical onClick={() => setShowEditBoardOption(prev => !prev)} />
               </div>
               {showEditBoardOption && (
                 <Card className="p-4 absolute right-10 top-20">
-                  <Button onClick={toggleEditBoardModal}>Edit Board</Button>
+                  <Button onClick={() => openModal('EDIT_BOARD')}>Edit Board</Button>
                   <Button onClick={handleBoardDelete}>Delete Board</Button>
                 </Card>
               )}
@@ -95,31 +94,10 @@ export default function Layout() {
         </SidebarProvider>
       ) : (
         <div className="w-full h-screen grid place-content-center">
-          <Button onClick={toggleShowAddBoardModal}>+ Create new board</Button>
+          <Button onClick={() => openModal('ADD_BOARD')}>+ Create new board</Button>
         </div>
       )}
-      <>
-        {showAddBoardModal && (
-          <Modal onClose={toggleShowAddBoardModal}>
-            <AddBoardModal />
-          </Modal>
-        )}
-        {showAddTaskModal && (
-          <Modal onClose={toggleShowAddTaskModal}>
-            <AddTaskForm />
-          </Modal>
-        )}
-        {showEditBoardModal && (
-          <Modal onClose={toggleEditBoardModal}>
-            <EditBoard />
-          </Modal>
-        )}
-        {showEditTaskModal && (
-          <Modal onClose={toggleEditTaskModal}>
-            <EditTaskModal />
-          </Modal>
-        )}
-      </>
+      {activeModal && <Modal onClose={closeModal}>{Modal_Components[activeModal]}</Modal>}
     </div>
   );
 }

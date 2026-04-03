@@ -1,18 +1,13 @@
 import { createContext } from 'react';
 
+export type ModalType = 'ADD_BOARD' | 'EDIT_BOARD' | 'ADD_TASK' | 'EDIT_TASK' | null;
+
 interface IModalContext {
-  showAddBoardModal: boolean;
-  showAddTaskModal: boolean;
-  showEditBoardModal: boolean;
-  showEditTaskModal: boolean;
-  toggleShowAddBoardModal?: () => void;
-  toggleShowAddTaskModal?: () => void;
-  toggleEditBoardModal?: () => void;
-  toggleEditTaskModal?: () => void;
+  activeModal: ModalType;
+  modalData?: unknown;
+
+  openModal: (type: ModalType, data?: unknown) => void;
+  closeModal: () => void;
 }
-export const ModalContext = createContext<IModalContext>({
-  showAddBoardModal: false,
-  showAddTaskModal: false,
-  showEditBoardModal: false,
-  showEditTaskModal: false,
-});
+
+export const ModalContext = createContext<IModalContext | undefined>(undefined);

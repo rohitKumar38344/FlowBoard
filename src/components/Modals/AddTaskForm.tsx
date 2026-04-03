@@ -5,8 +5,10 @@ import { selectColumnsByActiveBoard } from '@/features/column/columnsSlice';
 import { taskCreated } from '@/features/task/tasksSlice';
 import type { Subtask } from '@/types';
 import { subtasksAdded } from '@/features/subtask/subtaskSlice';
+import { useModal } from '@/hooks/useModal';
 
 export const AddTaskForm = () => {
+  const { closeModal } = useModal();
   const [subtasks, setSubtasks] = useState([
     {
       id: crypto.randomUUID(),
@@ -76,6 +78,7 @@ export const AddTaskForm = () => {
 
     dispatch(taskCreated(nextTask));
     dispatch(subtasksAdded(nextSubtasksToAdd));
+    closeModal();
   }
   return (
     <div

@@ -11,8 +11,10 @@ import { selectAllSubtasks } from '@/features/subtask/subtaskSlice';
 import { Button } from '../ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { selectColumnsByActiveBoard, taskUpdated } from '@/features/column/columnsSlice';
+import { useModal } from '@/hooks/useModal';
 
 export const EditTaskModal = () => {
+  const { closeModal } = useModal();
   const { taskId } = useParams();
   const dispatch = useAppDispatch();
   const task = useAppSelector(state => selectTaskById(state, taskId));
@@ -75,6 +77,7 @@ export const EditTaskModal = () => {
       nextColId: columns.find(column => column.title === taskStatus).id,
     };
     dispatch(taskUpdated(taskToUpdate));
+    closeModal();
   }
   return (
     <Card onClick={e => e.stopPropagation()} className="w-full sm:max-w-md p-8">

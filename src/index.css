@@ -136,3 +136,9 @@
 .pending {
   background-color: #2c2c2c;
 }
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}

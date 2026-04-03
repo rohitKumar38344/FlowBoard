@@ -8,11 +8,12 @@ interface ModalProps {
 export const Modal = ({ onClose, children }: ModalProps) => {
   return (
     <div
-      id="overlay"
-      className="fixed inset-0  z-50 cursor-pointer bg-[#00000080]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       onClick={onClose}
     >
-      {children}
+      <div onClick={e => e.stopPropagation()} className="cursor-default w-1/2">
+        {children}
+      </div>
     </div>
   );
 };

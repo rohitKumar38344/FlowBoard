@@ -10,14 +10,13 @@ import { Button } from '../ui/button';
 import { boardSelected, selectAllBoards } from '@/features/board/boardSlice';
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import { SquareKanban, Kanban } from 'lucide-react';
-import { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { ModalContext } from '../../context/ModalContext';
+import { useModal } from '@/hooks/useModal';
 
 export function AppSidebar() {
   const boards = useAppSelector(selectAllBoards);
   const dispatch = useAppDispatch();
-  const { toggleShowAddBoardModal } = useContext(ModalContext);
+  const { openModal } = useModal();
   const renderBoards = Object.values(boards).map((board, index) => (
     <NavLink
       key={index}
@@ -44,7 +43,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <ButtonGroup orientation={'vertical'}>
             {renderBoards}
-            <Button onClick={toggleShowAddBoardModal}>+ Create New Board</Button>
+            <Button onClick={() => openModal('ADD_BOARD')}>+ Create New Board</Button>
           </ButtonGroup>
         </SidebarGroup>
       </SidebarContent>

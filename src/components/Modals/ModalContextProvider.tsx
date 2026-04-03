@@ -1,27 +1,27 @@
 import { useState, type ReactNode } from 'react';
-import { ModalContext } from '../../context/ModalContext';
+import { ModalContext, type ModalType } from '../../context/ModalContext';
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
-  const [showAddBoardModal, setShowAddBoardModal] = useState(false);
-  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
-  const [showEditBoardModal, setShowEditBoardModal] = useState(false);
-  const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+  const [activeModal, setActiveModal] = useState<ModalType>(null);
+  const [modalData, setModalData] = useState<unknown>(null);
 
-  const toggleShowAddBoardModal = () => setShowAddBoardModal(prev => !prev);
-  const toggleShowAddTaskModal = () => setShowAddTaskModal(prev => !prev);
-  const toggleEditBoardModal = () => setShowEditBoardModal(prev => !prev);
-  const toggleEditTaskModal = () => setShowEditTaskModal(prev => !prev);
+  const openModal = (type: ModalType, data: unknown = null) => {
+    setActiveModal(type);
+    setModalData(data);
+  };
+
+  const closeModal = () => {
+    setActiveModal(null);
+    setModalData(null);
+  };
+
   return (
     <ModalContext.Provider
       value={{
-        showAddTaskModal,
-        showAddBoardModal,
-        toggleShowAddBoardModal,
-        toggleShowAddTaskModal,
-        showEditBoardModal,
-        toggleEditBoardModal,
-        showEditTaskModal,
-        toggleEditTaskModal,
+        activeModal,
+        modalData,
+        openModal,
+        closeModal,
       }}
     >
       {children}

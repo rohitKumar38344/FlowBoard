@@ -1,44 +1,80 @@
 import { useAppDispatch } from '@/app/store/hooks';
 import { boardAdded } from '@/features/board/boardSlice';
 import { columnsAdded } from '@/features/column/columnsSlice';
-import { useState } from 'react';
+import * as z from 'zod';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { nanoid } from '@reduxjs/toolkit';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useModal } from '@/hooks/useModal';
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from '../ui/field';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '../ui/input-group';
+import { Button } from '../ui/button';
+import { XIcon } from 'lucide-react';
+import { Input } from '../ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
+const addBoardSchema = z.object({
+  name: z
+    .string()
+    .min(5, 'Board name must be at least 5 characters.')
+    .max(32, 'Board name must be at most 32 characters.'),
+  columns: z
+    .array(
+      z.object({
+        id: z.string(),
+        title: z
+          .string()
+          .trim()
+          .min(4, 'Column title must be at least 4 charachters')
+          .max(10, 'Column title must be at most 10 characters')
+          .regex(/^[a-zA-Z]+[a-zA-Z0-9\s]+[a-zA-Z]$/, 'Column must be alpha numberic'),
+      })
+    )
+    .min(1, 'Board must have at least 1 column')
+    .max(5, 'Board atmost can contain 5 columns'),
+});
 export const AddBoardModal = () => {
-  const [columns, setColumns] = useState([
-    {
-      id: crypto.randomUUID(),
-      title: 'Todo',
-      errorMessage: 'column title must contain at least 10 chars',
-    },
-    {
-      id: crypto.randomUUID(),
-      title: 'Doing',
-      errorMessage: 'column title must contain at least 10 chars',
-    },
-  ]);
+  const { closeModal } = useModal();
   const dispatch = useAppDispatch();
-  function handleFormSubmit(e) {
-    e.preventDefault();
-    const formData = Object.fromEntries(new FormData(e.target));
-    console.log('formData', formData);
-    const cols = [];
-    for (const [key, value] of Object.entries(formData)) {
-      if (key.startsWith('column')) {
-        cols.push({
-          id: key.slice(7),
-          title: value,
-        });
-      }
-    }
 
-    const nextColumnIds = Array.from(columns, column => column.id);
+  const form = useForm<z.infer<typeof addBoardSchema>>({
+    resolver: zodResolver(addBoardSchema),
+    defaultValues: {
+      columns: [
+        {
+          id: nanoid(),
+          title: '',
+        },
+        {
+          id: nanoid(),
+          title: '',
+        },
+      ],
+    },
+  });
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'columns',
+  });
+
+  function onSubmit(data: z.infer<typeof addBoardSchema>) {
+    const nextColumnIds = data.columns.map(column => column.id);
     const nextBoard = {
-      id: crypto.randomUUID(),
-      name: formData.title,
+      id: nanoid(),
+      name: data.name,
       columnIds: nextColumnIds,
     };
 
-    const nextColumns = cols.map(col => {
+    const nextColumns = data.columns.map(col => {
       return {
         ...col,
         boardId: nextBoard.id,
@@ -48,66 +84,98 @@ export const AddBoardModal = () => {
 
     dispatch(boardAdded(nextBoard));
     dispatch(columnsAdded(nextColumns));
+    closeModal();
   }
 
-  function handleAddColumn(e) {
-    const columnId = crypto.randomUUID();
+  function handleAddColumn() {
+    const columnId = nanoid();
     const nextColumn = {
       id: columnId,
       title: '',
-      errorMessage: '',
     };
-    setColumns([...columns, nextColumn]);
+    append(nextColumn);
   }
 
-  function handleRemoveColumn(colId) {
-    if (!colId) return;
-    setColumns(columns.filter(column => column.id !== colId));
-  }
   return (
-    <div
-      className="w-80 absolute top-1/2 left-1/2 -translate-1/2 cursor-default rounded-md bg-green-500 z-20"
-      onClick={e => e.stopPropagation()}
-    >
-      <form onSubmit={handleFormSubmit} className="p-6 flex flex-col gap-4">
-        <h1 className="text-white">Add New Board</h1>
-        <div className="flex flex-col mb-1">
-          <label htmlFor="title">Board Name</label>
-          <input
-            type="text"
-            name="title"
-            id="title"
-            placeholder="e.g. Web Design"
-            minLength={5}
-            maxLength={20}
-            className="p-2 rounded-md"
-          />
-        </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Add New Board</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 flex flex-col gap-4">
+          <FieldGroup>
+            <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="name">Board Name</FieldLabel>
+                  <Input
+                    {...field}
+                    id="name"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="e.g. Web Design"
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+          </FieldGroup>
 
-        <div className="flex flex-col gap-4">
-          <p className=" text-white">Board Columns</p>
-          {columns.map(column => {
-            return (
-              <div key={column.id} className="flex gap-1 items-center">
-                <input
-                  type="text"
-                  name={`column-${column.id}`}
-                  className="rounded-md p-2"
-                  defaultValue={column.title}
+          <FieldSet>
+            <FieldLegend variant="label">Board Columns</FieldLegend>
+            <FieldDescription>Add upto 5 columns</FieldDescription>
+            <FieldGroup>
+              {fields.map((field, index) => (
+                <Controller
+                  key={field.id}
+                  name={`columns.${index}.title`}
+                  control={form.control}
+                  render={({ field: controllerField, fieldState }) => (
+                    <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+                      <FieldContent>
+                        <InputGroup>
+                          <InputGroupInput
+                            {...controllerField}
+                            id={`form-rhf-array-columns-${index}`}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="Todo"
+                          />
+                          {fields.length > 1 && (
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                type="button"
+                                variant="ghost"
+                                size="icon-xs"
+                                onClick={() => remove(index)}
+                                aria-label={`Remove column ${index + 1}`}
+                              >
+                                <XIcon />
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          )}
+                        </InputGroup>
+                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      </FieldContent>
+                    </Field>
+                  )}
                 />
-                <span onClick={() => handleRemoveColumn(column.id)} className="cursor-pointer">
-                  ❌
-                </span>
-              </div>
-            );
-          })}
-          <button type="button" onClick={handleAddColumn}>
-            + Add New Column
-          </button>
-        </div>
-
-        <button type="submit">Create New Board</button>
-      </form>
-    </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddColumn}
+                disabled={fields.length >= 5}
+              >
+                + Add New Column
+              </Button>
+            </FieldGroup>
+          </FieldSet>
+          <Button type="submit">Create New Board</Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
