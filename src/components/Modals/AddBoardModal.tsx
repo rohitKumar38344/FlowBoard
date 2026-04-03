@@ -34,9 +34,8 @@ const addBoardSchema = z.object({
         title: z
           .string()
           .trim()
-          .min(4, 'Column title must be at least 4 charachters')
-          .max(10, 'Column title must be at most 10 characters')
-          .regex(/^[a-zA-Z]+[a-zA-Z0-9\s]+[a-zA-Z]$/, 'Column must be alpha numberic'),
+          .min(1, 'Column title is required')
+          .max(10, 'Column title must be at most 20 characters'),
       })
     )
     .min(1, 'Board must have at least 1 column')

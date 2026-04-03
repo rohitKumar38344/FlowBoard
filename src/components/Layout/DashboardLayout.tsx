@@ -22,6 +22,7 @@ import { selectTaskEntities } from '@/features/task/tasksSlice';
 import { selectAllSubtasks } from '@/features/subtask/subtaskSlice';
 import { selectColumnsByActiveBoard } from '@/features/column/columnsSlice';
 import type { Task } from '@/types';
+import { Toaster } from 'sonner';
 
 export default function Layout() {
   const activeBoard = useAppSelector(selectActiveBoard);
@@ -98,6 +99,7 @@ export default function Layout() {
         </div>
       )}
       {activeModal && <Modal onClose={closeModal}>{Modal_Components[activeModal]}</Modal>}
+      <Toaster />
     </div>
   );
 }

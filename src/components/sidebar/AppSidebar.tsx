@@ -34,16 +34,20 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader>
-        <Kanban />
-        <p>kanban</p>
-      </SidebarHeader>
-      <p>ALL BOARDS ({renderBoards.length})</p>
+      <NavLink to={'/'}>
+        <SidebarHeader className="flex-row">
+          <Kanban />
+          <p>kanban</p>
+        </SidebarHeader>
+      </NavLink>
+      <h2 className="ml-2">ALL BOARDS ({renderBoards.length})</h2>
       <SidebarContent>
         <SidebarGroup>
           <ButtonGroup orientation={'vertical'}>
             {renderBoards}
-            <Button onClick={() => openModal('ADD_BOARD')}>+ Create New Board</Button>
+            <Button className="" onClick={() => openModal('ADD_BOARD')}>
+              + Create New Board
+            </Button>
           </ButtonGroup>
         </SidebarGroup>
       </SidebarContent>

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import './AddTaskForm.module.css';
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import { selectColumnsByActiveBoard } from '@/features/column/columnsSlice';
@@ -6,28 +5,88 @@ import { taskCreated } from '@/features/task/tasksSlice';
 import type { Subtask } from '@/types';
 import { subtasksAdded } from '@/features/subtask/subtaskSlice';
 import { useModal } from '@/hooks/useModal';
+import * as z from 'zod';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { nanoid } from '@reduxjs/toolkit';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from '../ui/field';
+import { Input } from '../ui/input';
+import {
+  InputGroup,
+  InputGroupTextarea,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroupButton,
+  InputGroupInput,
+} from '../ui/input-group';
+import { XIcon } from 'lucide-react';
+import { Button } from '../ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
+import { toast } from 'sonner';
 
+const addTaskSchema = z.object({
+  title: z.string().trim().min(1, 'Title is required').max(20, 'Title must be under 20 characters'),
+  description: z.string().trim().max(500, 'Description is too long'),
+  status: z.string().trim().min(1, 'Status is required'),
+  subtasks: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string().trim().min(1, 'Title is required').max(100, 'Title is too long'),
+      done: z.boolean(),
+    })
+  ),
+});
 export const AddTaskForm = () => {
   const { closeModal } = useModal();
-  const [subtasks, setSubtasks] = useState([
-    {
-      id: crypto.randomUUID(),
+  const form = useForm<z.infer<typeof addTaskSchema>>({
+    resolver: zodResolver(addTaskSchema),
+    defaultValues: {
       title: '',
-      done: false,
+      description: '',
+      status: '',
+      subtasks: [
+        {
+          id: nanoid(),
+          title: '',
+          done: false,
+        },
+        {
+          id: nanoid(),
+          title: '',
+          done: false,
+        },
+      ],
     },
-    {
-      id: crypto.randomUUID(),
-      title: '',
-      done: false,
-    },
-  ]);
+  });
+
   const columns = useAppSelector(selectColumnsByActiveBoard);
-  // console.log('columns', columns);
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'subtasks',
+  });
+
   const status = columns.map(column => column.title);
 
   const dispatch = useAppDispatch();
 
-  function handleAddSubtask(e) {
+  function handleAddSubtask() {
     const subtaskId = crypto.randomUUID();
     const nextSubtask: Subtask = {
       id: subtaskId,
@@ -35,33 +94,21 @@ export const AddTaskForm = () => {
       done: false,
       taskId: '',
     };
-    setSubtasks([...subtasks, nextSubtask]);
+    append(nextSubtask);
   }
 
-  function handleRemoveSubtask(subtaskId: string) {
-    if (!subtaskId) return;
-    setSubtasks(subtasks.filter(subtask => subtask.id !== subtaskId));
-  }
-
-  function handleSubtaskChange(id: string, value: string) {
-    const subtaskToUpdate = subtasks.find(subtask => subtask.id === id);
-    subtaskToUpdate.title = value;
-    if (subtaskToUpdate) {
-      setSubtasks(subtasks.map(subtask => (subtask.id == id ? subtaskToUpdate : subtask)));
-    }
-  }
-  function handleFormSubmit(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData);
-    const subtaskIds = subtasks.map(subtask => subtask.id);
-    // console.log(data)
+  function onSubmit(data: z.infer<typeof addTaskSchema>) {
+    const subtaskIds = data.subtasks.map(subtask => subtask.id);
+    console.log(data);
 
     const column = columns.find(column => column.title === data.status);
+    if (!column) {
+      throw new Error('Selected status column not found in store');
+    }
 
-    const taskId = crypto.randomUUID();
+    const taskId = nanoid();
 
-    const nextSubtasksToAdd = subtasks.map(subtask => {
+    const nextSubtasksToAdd = data.subtasks.map(subtask => {
       return {
         ...subtask,
         taskId,
@@ -72,82 +119,164 @@ export const AddTaskForm = () => {
       id: taskId,
       title: data.title,
       description: data.description,
-      columnId: column?.id,
+      columnId: column.id,
       subtaskIds,
     };
 
     dispatch(taskCreated(nextTask));
     dispatch(subtasksAdded(nextSubtasksToAdd));
     closeModal();
+    toast('You submitted the following values:', {
+      description: (
+        <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
+          <code>{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      ),
+      position: 'bottom-right',
+      classNames: {
+        content: 'flex flex-col gap-2',
+      },
+      style: {
+        '--border-radius': 'calc(var(--radius)  + 4px)',
+      } as React.CSSProperties,
+    });
   }
   return (
-    <div
-      className="w-80 absolute top-1/2 left-1/2 -translate-1/2 cursor-default rounded-md bg-green-500 z-20"
-      onClick={e => e.stopPropagation()}
-    >
-      <form onSubmit={handleFormSubmit} className=" p-6 flex flex-col gap-4">
-        <h1 className="text-[#EEEEEE]">Add New Task</h1>
-        <div className="flex flex-col mb-1">
-          <label htmlFor="title">Title</label>
-          <input
-            type="text"
-            name="title"
-            id="title"
-            placeholder="e.g. Take coffee break"
-            minLength={5}
-            maxLength={20}
-            className="p-2 rounded-md"
-            defaultValue={''}
-          />
-        </div>
-        <div>
-          <label htmlFor="description">Description</label>
-          <textarea
-            name="description"
-            id="description"
-            rows={10}
-            cols={30}
-            placeholder="e.g. It's alwasy good to take a break
-        This 15 minutes break will recharege the batteries a little.
-        "
-            minLength={20}
-            maxLength={100}
-            defaultValue={''}
-          ></textarea>
-        </div>
+    <Card className="px-4 py-4">
+      <CardHeader>
+        <CardTitle>Add New Task</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={form.handleSubmit(onSubmit)} id="addtask-form">
+          <FieldGroup>
+            <Controller
+              name="title"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="title">Title</FieldLabel>
+                  <Input
+                    id="title"
+                    {...field}
+                    placeholder="e.g. Take coffee break"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+            <Controller
+              name="description"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel data-invalid={fieldState.invalid} htmlFor="description">
+                    Description
+                  </FieldLabel>
+                  <InputGroup>
+                    <InputGroupTextarea
+                      {...field}
+                      id="description"
+                      placeholder="e.g. It's always good to take a break"
+                      rows={6}
+                      className="min-h-24 resize-none"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <InputGroupAddon align="block-end">
+                      <InputGroupText className="tabular-nums">
+                        {field.value.length}/100 characters
+                      </InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
 
-        <div>
-          <label htmlFor="subtasks">Subtasks</label>
-          {subtasks.map(subtask => {
-            return (
-              <div key={subtask.id}>
-                <input
-                  type="text"
-                  name={`subtask-${subtask.id}`}
-                  value={subtask.title}
-                  onChange={e => handleSubtaskChange(subtask.id, e.target.value)}
-                />
-                <span onClick={() => handleRemoveSubtask(subtask.id)}>❌</span>
-              </div>
-            );
-          })}
-          <button type="button" onClick={handleAddSubtask}>
-            + Add New Subtask
-          </button>
-        </div>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
 
-        <div>
-          <label htmlFor="status">Status</label>
-          <select name="status" id="status" data-options defaultValue={status[0] ?? ''}>
-            {status.map((status, index) => (
-              <option key={index} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </div>
-        <button type="submit">Create Task</button>
-      </form>
-    </div>
+            <FieldSet>
+              <FieldLegend variant="label">Subtasks</FieldLegend>
+              <FieldDescription>Add upto 5 Subtasks</FieldDescription>
+              <FieldGroup>
+                {fields.map((field, index) => (
+                  <Controller
+                    key={field.id}
+                    name={`subtasks.${index}.title`}
+                    control={form.control}
+                    render={({ field: controllerField, fieldState }) => (
+                      <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+                        <FieldContent>
+                          <InputGroup>
+                            <InputGroupInput
+                              {...controllerField}
+                              id={`subtask-${index}`}
+                              aria-invalid={fieldState.invalid}
+                              placeholder="e.g. Take a coffee break"
+                            />
+                            {fields.length > 1 && (
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupButton
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon-xs"
+                                  onClick={() => remove(index)}
+                                  aria-label={`Remove column ${index + 1}`}
+                                >
+                                  <XIcon />
+                                </InputGroupButton>
+                              </InputGroupAddon>
+                            )}
+                          </InputGroup>
+                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </FieldContent>
+                      </Field>
+                    )}
+                  />
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddSubtask}
+                  disabled={fields.length >= 5}
+                  className="w-full"
+                >
+                  + Add New Subtask
+                </Button>
+              </FieldGroup>
+            </FieldSet>
+            <FieldSet>
+              <FieldLegend>Status</FieldLegend>
+              <Controller
+                name="status"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full max-w-48">
+                        <SelectValue placeholder="Select a status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {status.map((statusName, i) => (
+                            <SelectItem value={statusName} key={i}>
+                              {statusName}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+              <Field>
+                <Button type="submit">Create Task</Button>
+              </Field>
+            </FieldSet>
+          </FieldGroup>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
