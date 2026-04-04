@@ -60,7 +60,7 @@ export const TaskViewModal = () => {
   }
 
   function handleTaskDelete() {
-    navigate('/');
+    navigate(`/board/${boardId}`);
     dispatch(
       taskDeleted({
         taskId,
