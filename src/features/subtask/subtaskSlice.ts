@@ -61,6 +61,7 @@ export const { subtasksAdded, subtaskMoved } = subtaskSlice.actions;
 export const selectSubtasksByTaskId = createSelector(
   [(state, taskId) => selectTaskById(state, taskId), state => state.subtasks.entities],
   function (task, subtaskEntities) {
+    if (!task) return [];
     const nextSubtasks = task?.subtaskIds.map(subtaskId => subtaskEntities[subtaskId]) ?? [];
     return nextSubtasks;
   }

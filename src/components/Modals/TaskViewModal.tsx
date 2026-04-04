@@ -1,39 +1,56 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Field, FieldContent, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../ui/field';
+import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../ui/field';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import { selectSubtasksByTaskId, subtaskStatusUpdated } from '@/features/subtask/subtaskSlice';
 import { selectTaskById, taskDeleted } from '@/features/task/tasksSlice';
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import { selectColumnsByActiveBoard, taskMoved } from '@/features/column/columnsSlice';
-import { EllipsisVertical } from 'lucide-react';
-import { ModalContext } from '@/context/ModalContext';
+import { EllipsisVertical, Trash2Icon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '../ui/button';
+import { useModal } from '@/hooks/useModal';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '../ui/alert-dialog';
 
 export const TaskViewModal = () => {
   const navigate = useNavigate();
-  const { taskId } = useParams();
-  const { boardId } = useParams();
+  const { boardId, taskId } = useParams<{ boardId: string; taskId: string }>();
+  const effectiveTaskId = taskId ?? '';
 
-  const task = useAppSelector(state => selectTaskById(state, taskId));
-  const subtasks = useAppSelector(state => selectSubtasksByTaskId(state, taskId));
+  const task = useAppSelector(state => selectTaskById(state, effectiveTaskId));
+  const subtasks = useAppSelector(state => selectSubtasksByTaskId(state, effectiveTaskId));
   const completed = useMemo(() => subtasks.filter(subtask => subtask.done), [subtasks]).length;
   const columns = useAppSelector(selectColumnsByActiveBoard);
   const dispatch = useAppDispatch();
+  const { openModal, closeModal } = useModal();
+
+  if (!task) return null;
+
   const sourceColId = task.columnId;
   const existingColName = columns.find(column => column.id === task.columnId)?.title;
-  const { openModal } = useContext(ModalContext);
 
   function handleChange(targetColumnName: string) {
     const targetColId = columns.find(col => col.title === targetColumnName)?.id;
-    dispatch(taskMoved({ taskId, sourceColId, targetColId }));
+    if (!targetColId) return;
+
+    dispatch(taskMoved({ taskId: effectiveTaskId, sourceColId, targetColId }));
   }
 
-  function handleSubtaskStatusChange(nextSubtask) {
+  function handleSubtaskStatusChange(nextSubtask: { id: string; changes: { done: boolean } }) {
     console.log('nextsubtask', nextSubtask);
     dispatch(subtaskStatusUpdated(nextSubtask));
   }
@@ -43,12 +60,15 @@ export const TaskViewModal = () => {
   }
 
   function handleTaskDelete() {
+    navigate('/');
     dispatch(
       taskDeleted({
         taskId,
         subtaskIds: task.subtaskIds,
       })
     );
+    closeModal();
+    // handleClose()
   }
 
   return (
@@ -70,7 +90,29 @@ export const TaskViewModal = () => {
             </PopoverTrigger>
             <PopoverContent align="start" className="w-40">
               <Button onClick={() => openModal('EDIT_TASK')}>Edit Task</Button>
-              <Button onClick={handleTaskDelete}>Delete Task</Button>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">Delete Task</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent size="sm">
+                  <AlertDialogHeader>
+                    <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                      <Trash2Icon />
+                    </AlertDialogMedia>
+                    <AlertDialogTitle>Delete this task?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {` Are you sure you want to delete the "${task.title}" task and its subtasks? This action cannot be reversed.`}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
+                    <AlertDialogAction variant="destructive" onClick={handleTaskDelete}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </PopoverContent>
           </Popover>
         </CardHeader>
@@ -87,14 +129,15 @@ export const TaskViewModal = () => {
                     id={`${subtask.title}-${subtask.id}`}
                     name={subtask.title}
                     defaultChecked={subtask.done}
-                    onCheckedChange={checked =>
+                    onCheckedChange={checked => {
+                      const done = checked === true;
                       handleSubtaskStatusChange({
                         id: subtask.id,
                         changes: {
-                          done: checked,
+                          done,
                         },
-                      })
-                    }
+                      });
+                    }}
                   />
                   <FieldLabel
                     htmlFor={`${subtask.title}-${subtask.id}`}
@@ -106,16 +149,14 @@ export const TaskViewModal = () => {
               ))}
             </FieldGroup>
           </FieldSet>
+          {/* <FieldSet> */}
 
-          <FieldGroup className="w-full max-w-xs">
-            <Field orientation="horizontal">
-              <FieldContent>
-                <FieldLabel htmlFor="align-item">Status</FieldLabel>
-              </FieldContent>
-            </Field>
-            <Field>
+          <FieldGroup className="w-full max-w-xs mt-4">
+            <Field orientation="vertical">
+              <FieldLabel htmlFor="status">Status</FieldLabel>
+
               <Select defaultValue={existingColName} onValueChange={handleChange}>
-                <SelectTrigger>
+                <SelectTrigger id="status">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -128,6 +169,7 @@ export const TaskViewModal = () => {
               </Select>
             </Field>
           </FieldGroup>
+          {/* </FieldSet> */}
         </CardContent>
       </Card>
     </div>

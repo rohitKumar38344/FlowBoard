@@ -3,10 +3,17 @@ import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { selectSubtasksByTaskId } from '../subtask/subtaskSlice';
 import { useAppSelector } from '@/app/store/hooks';
+import type { Task } from '@/types';
 
-export const TaskItem = memo(({ task }) => {
-  const subtasks = useAppSelector(state => selectSubtasksByTaskId(state, task.id));
+interface TaskItemProps {
+  task?: Task | null;
+}
+
+export const TaskItem = memo(({ task }: TaskItemProps) => {
+  const taskId = task?.id;
+  const subtasks = useAppSelector(state => selectSubtasksByTaskId(state, taskId));
   const completed = subtasks.reduce((count, subtask) => (subtask.done ? count + 1 : count), 0);
+  if (!task) return null;
   return (
     <Link to={`task/${task.id}`}>
       <Card>

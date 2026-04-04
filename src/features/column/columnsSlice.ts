@@ -7,7 +7,7 @@ import {
 } from '@reduxjs/toolkit';
 import { boardDeleted, boardUpdated, selectActiveBoardId } from '../board/boardSlice';
 import type { Column, Task } from '@/types';
-import { taskCreated } from '../task/tasksSlice';
+import { taskCreated, taskDeleted } from '../task/tasksSlice';
 
 const columnsAdapter = createEntityAdapter<Column>();
 
@@ -57,6 +57,15 @@ export const columnsSlice = createSlice({
         columnsAdapter.removeMany(state, [action.payload.removedColumnIds]);
 
         columnsAdapter.upsertMany(state, action.payload.newCols);
+      })
+      .addCase(taskDeleted, (state, action) => {
+        const { taskId } = action.payload;
+
+        Object.values(state.entities).forEach(column => {
+          if (column) {
+            column.taskIds = column.taskIds.filter(id => id !== taskId);
+          }
+        });
       })
       .addCase(boardDeleted, (state, action) => {
         const { colIds } = action.payload;
