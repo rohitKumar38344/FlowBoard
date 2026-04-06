@@ -35,7 +35,7 @@ const addBoardSchema = z.object({
           .string()
           .trim()
           .min(1, 'Column title is required')
-          .max(10, 'Column title must be at most 20 characters'),
+          .max(50, 'Column title must be at most 50 characters'),
       })
     )
     .min(1, 'Board must have at least 1 column')

@@ -38,6 +38,7 @@ export const boardSlice = createSlice({
         boardId: string;
         name: string;
         newCols: Column[];
+        removedColumnIds: string[];
       }>
     ) => {
       const { boardId, name, newCols } = action.payload;

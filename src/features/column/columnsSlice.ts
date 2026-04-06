@@ -54,7 +54,7 @@ export const columnsSlice = createSlice({
         }
       })
       .addCase(boardUpdated, (state, action) => {
-        columnsAdapter.removeMany(state, [action.payload.removedColumnIds]);
+        columnsAdapter.removeMany(state, action.payload.removedColumnIds);
 
         columnsAdapter.upsertMany(state, action.payload.newCols);
       })
