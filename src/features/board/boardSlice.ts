@@ -6,6 +6,7 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit';
+import type { Column } from '@/types';
 
 const boardsAdapter = createEntityAdapter<Board>();
 export const boardSlice = createSlice({
@@ -31,7 +32,14 @@ export const boardSlice = createSlice({
       state.activeBoardId = action.payload;
     },
     boardAdded: boardsAdapter.addOne,
-    boardUpdated: (state, action) => {
+    boardUpdated: (
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        name: string;
+        newCols: Column[];
+      }>
+    ) => {
       const { boardId, name, newCols } = action.payload;
       boardsAdapter.updateOne(state, {
         id: boardId,
@@ -52,8 +60,15 @@ export const boardSlice = createSlice({
     ) => {
       const { boardId } = action.payload;
       boardsAdapter.removeOne(state, boardId);
-      state.activeBoardId = state.ids.pop();
+      const nextActiveBoard = state.ids.pop();
+      if (nextActiveBoard) state.activeBoardId = nextActiveBoard;
+      else state.activeBoardId = '';
     },
+  },
+  extraReducers: builder => {
+    builder.addCase(boardAdded, (state, action) => {
+      state.activeBoardId = action.payload.id;
+    });
   },
 });
 

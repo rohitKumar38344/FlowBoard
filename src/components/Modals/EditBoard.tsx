@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import { boardUpdated, selectActiveBoard } from '@/features/board/boardSlice';
-import { columnsUpdated, selectColumnsByActiveBoard } from '@/features/column/columnsSlice';
+import { selectColumnsByActiveBoard } from '@/features/column/columnsSlice';
 import { useModal } from '@/hooks/useModal';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
@@ -63,7 +63,6 @@ export const EditBoard = () => {
       {' '}
       <CardHeader>
         <CardTitle>Edit Board</CardTitle>
-        <CardDescription>Help us improve by reporting bugs you encounter.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onClick={e => e.stopPropagation()} onSubmit={handleFormSubmit} className="">

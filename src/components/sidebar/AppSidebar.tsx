@@ -25,10 +25,16 @@ export function AppSidebar() {
         return isActive ? 'active' : isPending ? 'pending' : '';
       }}
     >
-      <Button className="flex-row" onClick={() => dispatch(boardSelected(board.id))}>
-        <SquareKanban />
-        {board.name}
-      </Button>
+      {({ isActive }) => (
+        <Button
+          className="w-full flex-row justify-start"
+          variant={isActive ? 'default' : 'outline'}
+          onClick={() => dispatch(boardSelected(board.id))}
+        >
+          <SquareKanban />
+          {board.name}
+        </Button>
+      )}
     </NavLink>
   ));
 
@@ -37,15 +43,15 @@ export function AppSidebar() {
       <NavLink to={'/'}>
         <SidebarHeader className="flex-row">
           <Kanban />
-          <p>kanban</p>
+          <p>Flowboard</p>
         </SidebarHeader>
       </NavLink>
       <h2 className="ml-2">ALL BOARDS ({renderBoards.length})</h2>
       <SidebarContent>
         <SidebarGroup>
-          <ButtonGroup orientation={'vertical'}>
+          <ButtonGroup orientation={'vertical'} className="gap-2">
             {renderBoards}
-            <Button className="" onClick={() => openModal('ADD_BOARD')}>
+            <Button className="w-full" onClick={() => openModal('ADD_BOARD')}>
               + Create New Board
             </Button>
           </ButtonGroup>

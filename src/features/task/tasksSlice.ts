@@ -1,11 +1,6 @@
 import type { RootState } from '@/app/store/store';
 import type { Task } from '@/types';
-import {
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  type PayloadAction,
-} from '@reduxjs/toolkit';
+import { createEntityAdapter, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { taskMoved, taskUpdated } from '../column/columnsSlice';
 import { boardDeleted } from '../board/boardSlice';
 

@@ -2,6 +2,9 @@ import { ColumnList } from '../column/ColumnList';
 import { useAppSelector } from '@/app/store/hooks';
 import { Outlet, useParams } from 'react-router-dom';
 import type { RootState } from '@/app/store/store';
+import { Spinner } from '@/components/ui/spinner';
+import { Suspense } from 'react';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 export const Board = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -15,8 +18,9 @@ export const Board = () => {
       <div className="flex overflow-x-auto p-4 gap-4">
         <ColumnList columnIds={columnIds} />
       </div>
-
-      <Outlet />
+      <Suspense fallback={<LoadingSpinner />}>
+        <Outlet />
+      </Suspense>
     </>
   );
 };

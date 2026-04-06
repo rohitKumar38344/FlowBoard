@@ -7,15 +7,16 @@ import {
   selectActiveBoard,
   selectActiveBoardColumnIds,
 } from '@/features/board/boardSlice';
-import { Outlet } from 'react-router-dom';
-import { type ReactNode } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { Suspense, type ReactNode } from 'react';
 
 import { useModal } from '@/hooks/useModal';
-import { AddBoardModal } from '../Modals/AddBoardModal';
-import { AddTaskForm } from '../Modals/AddTaskForm';
-import { Modal } from '../Modals/Modal';
-import { EditBoard } from '../Modals/EditBoard';
-import { EditTaskModal } from '../Modals/EditTaskModal';
+const AddBoardModal = lazyLoad(() => import('../Modals/AddBoardModal'), 'AddBoardModal');
+const AddTaskForm = lazyLoad(() => import('../Modals/AddTaskForm'), 'AddTaskForm');
+const EditBoard = lazyLoad(() => import('../Modals/EditBoard'), 'EditBoard');
+const EditTaskModal = lazyLoad(() => import('../Modals/EditTaskModal'), 'EditTaskModal');
+const Modal = lazyLoad(() => import('../Modals/Modal'), 'Modal');
+
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import { selectTaskEntities } from '@/features/task/tasksSlice';
 import { selectAllSubtasks } from '@/features/subtask/subtaskSlice';
@@ -35,6 +36,8 @@ import {
   AlertDialogTrigger,
 } from '../ui/alert-dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { LoadingSpinner } from '../LoadingSpinner';
+import { lazyLoad } from '@/utils/lazyLoad';
 export default function Layout() {
   const activeBoard = useAppSelector(selectActiveBoard);
   const columnIds = useAppSelector(selectActiveBoardColumnIds);
@@ -44,7 +47,7 @@ export default function Layout() {
 
   const { activeModal, closeModal, openModal } = useModal();
   const dispatch = useAppDispatch();
-
+  const navigate = useNavigate();
   function handleBoardDelete() {
     const boardId = activeBoard?.id;
     if (!boardId) return;
@@ -67,6 +70,7 @@ export default function Layout() {
     }
     // console.log('taskids', taskIds, subtaskIds);
     if (boardId) {
+      navigate('/');
       dispatch(boardDeleted({ boardId, colIds, taskIds, subtaskIds }));
     }
   }
@@ -126,7 +130,9 @@ export default function Layout() {
               </Popover>
             </header>
             <main className="flex-1">
-              <Outlet />
+              <Suspense fallback={<LoadingSpinner />}>
+                <Outlet />
+              </Suspense>
             </main>
           </div>
         </SidebarProvider>
@@ -135,7 +141,11 @@ export default function Layout() {
           <Button onClick={() => openModal('ADD_BOARD')}>+ Create new board</Button>
         </div>
       )}
-      {activeModal && <Modal onClose={closeModal}>{Modal_Components[activeModal]}</Modal>}
+      {activeModal && (
+        <Suspense fallback={<LoadingSpinner />}>
+          <Modal onClose={closeModal}>{Modal_Components[activeModal]}</Modal>
+        </Suspense>
+      )}
       <Toaster />
     </div>
   );
