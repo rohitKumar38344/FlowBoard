@@ -1,12 +1,22 @@
-import { lazy } from 'react';
+// Type-safe lazyLoad utility implementation
 
-export const lazyLoad = (path, namedExport: string) => {
-  return lazy(() => {
-    const promise = path();
-    if (namedExport === null) {
-      return promise;
-    } else {
-      return promise.then(module => ({ default: module[namedExport] }));
+function lazyLoad<T>(element: T, callback: () => void): void {
+    if (element instanceof HTMLElement) {
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        callback();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+            observer.observe(element);
+        } else {
+            // Fallback for browsers without IntersectionObserver
+            callback();
+        }
     }
-  });
-};
+}
+
+export default lazyLoad;
