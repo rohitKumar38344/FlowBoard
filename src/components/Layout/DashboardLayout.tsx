@@ -49,7 +49,7 @@ export default function Layout() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   function handleBoardDelete() {
-    const boardId = activeBoard?.id;
+    const boardId = activeBoard?.boardId;
     if (!boardId) return;
 
     const colIds = columnIds ?? [];
@@ -59,13 +59,13 @@ export default function Layout() {
 
     for (let i = 0; i < columnsEntites.length; i++) {
       for (const taskId of columnsEntites[i].taskIds) {
-        taskIds.push(allTaskEntities[taskId].id);
+        taskIds.push(allTaskEntities[taskId].taskId);
         allTasks.push(allTaskEntities[taskId]);
       }
     }
     for (let i = 0; i < allTasks.length; i++) {
       for (const subtaskId of allTasks[i].subtaskIds) {
-        subtaskIds.push(allSubtaskEntities[subtaskId].id);
+        subtaskIds.push(allSubtaskEntities[subtaskId].subtaskId);
       }
     }
     // console.log('taskids', taskIds, subtaskIds);

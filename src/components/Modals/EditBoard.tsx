@@ -10,18 +10,18 @@ import {
   FieldDescription,
   FieldError,
   FieldGroup,
-  FieldLabel,
   FieldLegend,
   FieldSet,
 } from '../ui/field';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
 import { XIcon } from 'lucide-react';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '../ui/input-group';
 import * as z from 'zod';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { nanoid } from '@reduxjs/toolkit';
+import type { DeletedColumnInfo } from '@/types';
+import { selectTaskEntities } from '@/features/task/tasksSlice';
 
 const editBoardSchema = z.object({
   name: z
@@ -31,7 +31,7 @@ const editBoardSchema = z.object({
   columns: z
     .array(
       z.object({
-        id: z.string(),
+        columnId: z.string(),
         boardId: z.string(),
         title: z
           .string()
@@ -47,7 +47,8 @@ export const EditBoard = () => {
   const board = useAppSelector(selectActiveBoard);
   const columns = useAppSelector(selectColumnsByActiveBoard);
 
-  const [removedColumnIds, setRemovedColumnIds] = useState<string[]>([]);
+  const taskEntities = useAppSelector(selectTaskEntities);
+  const [removedColumns, setRemovedColumns] = useState<DeletedColumnInfo[]>([]);
   const dispatch = useAppDispatch();
   const form = useForm<z.infer<typeof editBoardSchema>>({
     resolver: zodResolver(editBoardSchema),
@@ -56,35 +57,48 @@ export const EditBoard = () => {
       columns: [...columns],
     },
   });
+  console.log('form defaults', form.getValues());
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'columns',
   });
+
   if (!board) return null;
 
   function handleAddColumn() {
     if (!board) return;
-    const colId = nanoid();
+    const columnId = nanoid();
     append({
-      id: colId,
+      columnId,
       title: '',
-      boardId: board.id,
+      boardId: board.boardId,
       taskIds: [],
     });
   }
 
-  function handleRemoveColumn(colId: string, index: number) {
+  function handleRemoveColumn(index: number, colId: string) {
     remove(index);
-    setRemovedColumnIds(prevRemovedColIds => [...prevRemovedColIds, colId]);
+    const taskIds = columns.find(col => col.columnId === colId)?.taskIds || [];
+    const removedCol: DeletedColumnInfo = {
+      columnId: colId,
+      taskIds,
+      subtaskIds: taskIds
+        .map(taskId => taskEntities[taskId])
+        .map(task => task.subtaskIds)
+        .flat(1)
+        .filter(Boolean),
+    };
+
+    setRemovedColumns(prev => [...prev, removedCol]);
   }
 
   function onSubmit(data: z.infer<typeof editBoardSchema>) {
     if (!board) return;
     const nextBoard = {
-      boardId: board.id,
+      boardId: board.boardId,
       name: data.name,
       newCols: data.columns,
-      removedColumnIds,
+      removedColumns,
     };
 
     dispatch(boardUpdated(nextBoard));
@@ -98,42 +112,23 @@ export const EditBoard = () => {
       </CardHeader>
       <CardContent>
         <form id="form-edit-input" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-            <Controller
-              name="name"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field>
-                  <FieldLabel htmlFor={field.name}>Board Name</FieldLabel>
-
-                  <Input
-                    {...field}
-                    value={field.value}
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </FieldGroup>
           <FieldSet>
-            <FieldLegend variant="label">Board Columns</FieldLegend>
-            <FieldDescription>Add up to 5 Columns.</FieldDescription>
+            <FieldLegend>Board Name</FieldLegend>
+            <FieldDescription>Add upto 5 Columns</FieldDescription>
 
-            <FieldGroup className="gap-4">
+            <FieldGroup>
               {fields.map((field, index) => (
                 <Controller
-                  key={field.id}
                   name={`columns.${index}.title`}
+                  key={field.id}
                   control={form.control}
                   render={({ field: controllerField, fieldState }) => (
-                    <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+                    <Field orientation={'horizontal'} data-invalid={fieldState.invalid}>
                       <FieldContent>
                         <InputGroup>
                           <InputGroupInput
                             {...controllerField}
-                            id={`form-edit-column-${index}`}
+                            id={`form-rhf-array-email-${index}`}
                             aria-invalid={fieldState.invalid}
                           />
                           {fields.length > 1 && (
@@ -142,7 +137,7 @@ export const EditBoard = () => {
                                 type="button"
                                 variant="ghost"
                                 size="icon-xs"
-                                onClick={() => handleRemoveColumn(index, field.id)}
+                                onClick={() => handleRemoveColumn(index, field.columnId)}
                                 aria-label={`Remove column ${index + 1}`}
                               >
                                 <XIcon />

@@ -1,18 +1,18 @@
 export interface Board {
-  id: string;
+  boardId: string;
   name: string;
   columnIds: string[];
 }
 
 export interface Column {
-  id: string;
+  columnId: string;
   title: string;
   boardId: string;
   taskIds: string[];
 }
 
 export interface Task {
-  id: string;
+  taskId: string;
   title: string;
   description: string;
   columnId: string;
@@ -20,8 +20,18 @@ export interface Task {
 }
 
 export interface Subtask {
-  id: string;
+  subtaskId: string;
   title: string;
   done: boolean;
   taskId: string;
+}
+
+export interface DeletedColumnInfo {
+  columnId: string;
+  taskIds?: string[];
+  subtaskIds?: string[];
+}
+
+export interface DeletedSubtaskInfo {
+  subtaskIds: string[];
 }

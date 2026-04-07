@@ -20,7 +20,7 @@ export function AppSidebar() {
   const renderBoards = Object.values(boards).map((board, index) => (
     <NavLink
       key={index}
-      to={`/board/${board.id}`}
+      to={`/board/${board.boardId}`}
       className={({ isActive, isPending }) => {
         return isActive ? 'active' : isPending ? 'pending' : '';
       }}
@@ -29,7 +29,7 @@ export function AppSidebar() {
         <Button
           className="w-full flex-row justify-start"
           variant={isActive ? 'default' : 'outline'}
-          onClick={() => dispatch(boardSelected(board.id))}
+          onClick={() => dispatch(boardSelected(board.boardId))}
         >
           <SquareKanban />
           {board.name}

@@ -8,23 +8,25 @@ import type { Subtask } from '@/types';
 import { selectTaskById, taskDeleted } from '../task/tasksSlice';
 import type { RootState } from '@/app/store/store';
 import { taskUpdated } from '../column/columnsSlice';
-import { boardDeleted } from '../board/boardSlice';
+import { boardDeleted, boardUpdated } from '../board/boardSlice';
 
-const subtasksAdapter = createEntityAdapter<Subtask>();
+const subtasksAdapter = createEntityAdapter<Subtask, string>({
+  selectId: subtask => subtask.subtaskId,
+});
 
 export const subtaskSlice = createSlice({
   name: 'subtasks',
   initialState: subtasksAdapter.getInitialState({
     ids: ['s1', 's2', 's3'],
     entities: {
-      s1: { id: 's1', taskId: 't1', title: 'Read Redux Docs', done: true },
+      s1: { subtaskId: 's1', taskId: 't1', title: 'Read Redux Docs', done: true },
       s2: {
-        id: 's2',
+        subtaskId: 's2',
         taskId: 't1',
         title: 'Watch Senior Review Video',
         done: false,
       },
-      s3: { id: 's3', taskId: 't3', title: 'Write Unit Tests', done: false },
+      s3: { subtaskId: 's3', taskId: 't3', title: 'Write Unit Tests', done: false },
     },
   }),
   reducers: {
@@ -42,8 +44,14 @@ export const subtaskSlice = createSlice({
     builder
       .addCase(taskUpdated, (state, action) => {
         const { subtasksRemoved, draftSubtasks } = action.payload;
+        console.log('subtasksRemoved', subtasksRemoved);
         subtasksAdapter.removeMany(state, subtasksRemoved);
         subtasksAdapter.upsertMany(state, draftSubtasks);
+      })
+      .addCase(boardUpdated, (state, action) => {
+        const { removedColumns } = action.payload;
+        const removedSubtaskIds = removedColumns.flatMap(rCol => rCol.subtaskIds) as string[];
+        subtasksAdapter.removeMany(state, removedSubtaskIds);
       })
       .addCase(boardDeleted, (state, action) => {
         const { subtaskIds } = action.payload;

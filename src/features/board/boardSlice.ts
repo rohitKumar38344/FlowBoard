@@ -1,5 +1,5 @@
 import type { RootState } from '@/app/store/store';
-import type { Board } from '@/types';
+import type { Board, DeletedColumnInfo } from '@/types';
 import {
   createEntityAdapter,
   createSelector,
@@ -8,7 +8,9 @@ import {
 } from '@reduxjs/toolkit';
 import type { Column } from '@/types';
 
-const boardsAdapter = createEntityAdapter<Board>();
+const boardsAdapter = createEntityAdapter<Board, string>({
+  selectId: board => board.boardId,
+});
 export const boardSlice = createSlice({
   name: 'boards',
   initialState: boardsAdapter.getInitialState({
@@ -16,12 +18,12 @@ export const boardSlice = createSlice({
     activeBoardId: 'b1',
     entities: {
       b1: {
-        id: 'b1',
+        boardId: 'b1',
         name: 'Frontend Roadmap',
         columnIds: ['c1', 'c2', 'c3'],
       },
       b2: {
-        id: 'b2',
+        boardId: 'b2',
         name: 'Personal Errands',
         columnIds: ['c4'],
       },
@@ -31,14 +33,18 @@ export const boardSlice = createSlice({
     boardSelected: (state, action: PayloadAction<string>) => {
       state.activeBoardId = action.payload;
     },
-    boardAdded: boardsAdapter.addOne,
+    boardCreated: (state, action) => {
+      const { board } = action.payload;
+
+      boardsAdapter.addOne(state, board);
+    },
     boardUpdated: (
       state,
       action: PayloadAction<{
         boardId: string;
         name: string;
         newCols: Column[];
-        removedColumnIds: string[];
+        removedColumns: DeletedColumnInfo[];
       }>
     ) => {
       const { boardId, name, newCols } = action.payload;
@@ -46,7 +52,7 @@ export const boardSlice = createSlice({
         id: boardId,
         changes: {
           name,
-          columnIds: newCols.map(column => column.id),
+          columnIds: newCols.map(column => column.columnId),
         },
       });
     },
@@ -67,8 +73,8 @@ export const boardSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(boardAdded, (state, action) => {
-      state.activeBoardId = action.payload.id;
+    builder.addCase(boardCreated, (state, action) => {
+      state.activeBoardId = action.payload.boardId;
     });
   },
 });
@@ -93,5 +99,5 @@ export const selectAllBoards = createSelector([selectBoardEntities], entities =>
   Object.values(entities)
 );
 
-export const { boardAdded, boardSelected, boardUpdated, boardDeleted } = boardSlice.actions;
+export const { boardCreated, boardSelected, boardUpdated, boardDeleted } = boardSlice.actions;
 export default boardSlice.reducer;

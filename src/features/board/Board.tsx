@@ -2,7 +2,6 @@ import { ColumnList } from '../column/ColumnList';
 import { useAppSelector } from '@/app/store/hooks';
 import { Outlet, useParams } from 'react-router-dom';
 import type { RootState } from '@/app/store/store';
-import { Spinner } from '@/components/ui/spinner';
 import { Suspense } from 'react';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 

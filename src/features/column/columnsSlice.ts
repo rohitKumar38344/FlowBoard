@@ -5,21 +5,23 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit';
-import { boardDeleted, boardUpdated, selectActiveBoardId } from '../board/boardSlice';
+import { boardCreated, boardDeleted, boardUpdated, selectActiveBoardId } from '../board/boardSlice';
 import type { Column, Task } from '@/types';
 import { taskCreated, taskDeleted } from '../task/tasksSlice';
 
-const columnsAdapter = createEntityAdapter<Column>();
+const columnsAdapter = createEntityAdapter<Column, string>({
+  selectId: column => column.columnId,
+});
 
 export const columnsSlice = createSlice({
   name: 'columns',
   initialState: columnsAdapter.getInitialState({
     ids: ['c1', 'c2', 'c3', 'c4'],
     entities: {
-      c1: { id: 'c1', boardId: 'b1', title: 'Todo', taskIds: ['t1', 't2'] },
-      c2: { id: 'c2', boardId: 'b1', title: 'Doing', taskIds: ['t3'] },
-      c3: { id: 'c3', boardId: 'b1', title: 'Done', taskIds: ['t4'] },
-      c4: { id: 'c4', boardId: 'b2', title: 'Urgent', taskIds: ['t5'] },
+      c1: { columnId: 'c1', boardId: 'b1', title: 'Todo', taskIds: ['t1', 't2'] },
+      c2: { columnId: 'c2', boardId: 'b1', title: 'Doing', taskIds: ['t3'] },
+      c3: { columnId: 'c3', boardId: 'b1', title: 'Done', taskIds: ['t4'] },
+      c4: { columnId: 'c4', boardId: 'b2', title: 'Urgent', taskIds: ['t5'] },
     },
   }),
   reducers: {
@@ -50,13 +52,15 @@ export const columnsSlice = createSlice({
         const column = state.entities[action.payload.columnId];
 
         if (column) {
-          column.taskIds.push(action.payload.id);
+          column.taskIds.push(action.payload.taskId);
         }
       })
       .addCase(boardUpdated, (state, action) => {
-        columnsAdapter.removeMany(state, action.payload.removedColumnIds);
+        const { removedColumns, newCols } = action.payload;
+        const removedColumnIds = removedColumns.map(rCol => rCol.columnId);
+        columnsAdapter.removeMany(state, removedColumnIds);
 
-        columnsAdapter.upsertMany(state, action.payload.newCols);
+        columnsAdapter.upsertMany(state, newCols);
       })
       .addCase(taskDeleted, (state, action) => {
         const { taskId } = action.payload;
@@ -71,6 +75,9 @@ export const columnsSlice = createSlice({
         const { colIds } = action.payload;
 
         columnsAdapter.removeMany(state, colIds);
+      })
+      .addCase(boardCreated, (state, action) => {
+        columnsAdapter.addMany(state, action.payload.columns);
       });
   },
 });

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import {
   Field,
@@ -49,7 +49,7 @@ const editTaskSchema = z.object({
   description: z.string().trim().max(400, 'Description is too long'),
   subtasks: z.array(
     z.object({
-      id: z.string(),
+      subtaskId: z.string(),
       title: z.string().trim().min(1, 'Title is required').max(100, 'Title is too long'),
       done: z.boolean(),
     })
@@ -60,16 +60,16 @@ export const EditTaskModal = () => {
   const { closeModal } = useModal();
   const { taskId } = useParams();
   const dispatch = useAppDispatch();
-  const task = useAppSelector(state => selectTaskById(state, taskId));
+  const task = useAppSelector(state => selectTaskById(state, taskId!));
 
   const subtasksMap = useAppSelector(state => selectAllSubtasks(state));
   const subtasks = task.subtaskIds.map(subtaskId => subtasksMap[subtaskId]).filter(Boolean);
 
   const columns = useAppSelector(selectColumnsByActiveBoard);
   // column
-  const currentColumnStatus = columns.find(column => column.id === task.columnId);
+  const currentColumnStatus = columns.find(column => column.columnId === task.columnId);
 
-  const subtasksRemovedIdRef = useRef<string[]>([]);
+  const [subtasksRemoved, setSubtasksRemoved] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof editTaskSchema>>({
     resolver: zodResolver(editTaskSchema),
@@ -85,12 +85,13 @@ export const EditTaskModal = () => {
     name: 'subtasks',
   });
   function handleRemoveSubtask(index: number, subtaskId: string) {
+    console.log('subtaskid', subtaskId);
     remove(index);
-    subtasksRemovedIdRef.current.push(subtaskId);
+    setSubtasksRemoved(prevRemovedSubtasks => [...prevRemovedSubtasks, subtaskId]);
   }
   function handleAddSubtask() {
     const nextSubtask = {
-      id: nanoid(),
+      subtaskId: nanoid(),
       taskId: taskId,
       title: '',
       done: false,
@@ -106,13 +107,13 @@ export const EditTaskModal = () => {
       return;
     }
     const taskToUpdate = {
-      existingTaskId: task.id,
+      existingTaskId: task.taskId,
       title: data.title,
       description: data.description,
       draftSubtasks: data.subtasks,
-      subtasksRemoved: subtasksRemovedIdRef.current,
+      subtasksRemoved,
       existingColId: task.columnId,
-      nextColId: nextColumn.id,
+      nextColId: nextColumn.columnId,
     };
     dispatch(taskUpdated(taskToUpdate));
     closeModal();
@@ -197,7 +198,7 @@ export const EditTaskModal = () => {
                                   type="button"
                                   variant="ghost"
                                   size="icon-xs"
-                                  onClick={() => handleRemoveSubtask(index, field.id)}
+                                  onClick={() => handleRemoveSubtask(index, field.subtaskId)}
                                   aria-label={`Remove subtask ${index + 1}`}
                                 >
                                   <XIcon />

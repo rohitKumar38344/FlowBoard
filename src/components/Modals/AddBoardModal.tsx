@@ -1,6 +1,5 @@
 import { useAppDispatch } from '@/app/store/hooks';
-import { boardAdded } from '@/features/board/boardSlice';
-import { columnsAdded } from '@/features/column/columnsSlice';
+import { boardCreated } from '@/features/board/boardSlice';
 import * as z from 'zod';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { nanoid } from '@reduxjs/toolkit';
@@ -30,12 +29,13 @@ const addBoardSchema = z.object({
   columns: z
     .array(
       z.object({
-        id: z.string(),
+        columnId: z.string(),
         title: z
           .string()
           .trim()
           .min(1, 'Column title is required')
           .max(50, 'Column title must be at most 50 characters'),
+        taskIds: z.array(z.string()),
       })
     )
     .min(1, 'Board must have at least 1 column')
@@ -48,14 +48,17 @@ export const AddBoardModal = () => {
   const form = useForm<z.infer<typeof addBoardSchema>>({
     resolver: zodResolver(addBoardSchema),
     defaultValues: {
+      name: '',
       columns: [
         {
-          id: nanoid(),
+          columnId: nanoid(),
           title: '',
+          taskIds: [],
         },
         {
-          id: nanoid(),
+          columnId: nanoid(),
           title: '',
+          taskIds: [],
         },
       ],
     },
@@ -66,31 +69,40 @@ export const AddBoardModal = () => {
   });
 
   function onSubmit(data: z.infer<typeof addBoardSchema>) {
-    const nextColumnIds = data.columns.map(column => column.id);
+    // const nextColumnIds = data.columns.map(column => column.columnId);
+    const boardId = nanoid();
     const nextBoard = {
-      id: nanoid(),
-      name: data.name,
-      columnIds: nextColumnIds,
-    };
-
-    const nextColumns = data.columns.map(col => {
-      return {
+      board: {
+        boardId,
+        name: data.name,
+        columnIds: data.columns.map(col => col.columnId),
+      },
+      columns: data.columns.map(col => ({
         ...col,
-        boardId: nextBoard.id,
+        boardId,
         taskIds: [],
-      };
-    });
+      })),
+    };
+    // console.log('nextColumns', data.columns)
+    //     const nextColumns = data.columns.map(col => {
+    //       return {
+    //         ...col,
+    //         boardId: nextBoard.boardId,
+    //         taskIds: [],
+    //       };
+    //     });
 
-    dispatch(boardAdded(nextBoard));
-    dispatch(columnsAdded(nextColumns));
+    dispatch(boardCreated(nextBoard));
+    // dispatch(columnsAdded(nextColumns));
     closeModal();
   }
 
   function handleAddColumn() {
     const columnId = nanoid();
     const nextColumn = {
-      id: columnId,
+      columnId,
       title: '',
+      taskIds: [],
     };
     append(nextColumn);
   }

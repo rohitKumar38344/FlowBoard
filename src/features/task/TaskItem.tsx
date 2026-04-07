@@ -10,12 +10,12 @@ interface TaskItemProps {
 }
 
 export const TaskItem = memo(({ task }: TaskItemProps) => {
-  const taskId = task?.id;
+  const taskId = task?.taskId;
   const subtasks = useAppSelector(state => selectSubtasksByTaskId(state, taskId));
   const completed = subtasks.reduce((count, subtask) => (subtask.done ? count + 1 : count), 0);
   if (!task) return null;
   return (
-    <Link to={`task/${task.id}`}>
+    <Link to={`task/${task.taskId}`}>
       <Card>
         <CardHeader>
           <CardTitle>{task.title}</CardTitle>

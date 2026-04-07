@@ -41,10 +41,10 @@ export const TaskViewModal = () => {
   if (!task) return null;
 
   const sourceColId = task.columnId;
-  const existingColName = columns.find(column => column.id === task.columnId)?.title;
+  const existingColName = columns.find(column => column.columnId === task.columnId)?.title;
 
   function handleChange(targetColumnName: string) {
-    const targetColId = columns.find(col => col.title === targetColumnName)?.id;
+    const targetColId = columns.find(col => col.title === targetColumnName)?.columnId;
     if (!targetColId) return;
 
     dispatch(taskMoved({ taskId: effectiveTaskId, sourceColId, targetColId }));
@@ -68,7 +68,6 @@ export const TaskViewModal = () => {
       })
     );
     closeModal();
-    // handleClose()
   }
 
   return (
@@ -124,15 +123,15 @@ export const TaskViewModal = () => {
 
             <FieldGroup className="gap-3">
               {subtasks.map(subtask => (
-                <Field orientation="horizontal" key={subtask.id}>
+                <Field orientation="horizontal" key={subtask.subtaskId}>
                   <Checkbox
-                    id={`${subtask.title}-${subtask.id}`}
+                    id={`${subtask.title}-${subtask.subtaskId}`}
                     name={subtask.title}
                     defaultChecked={subtask.done}
                     onCheckedChange={checked => {
                       const done = checked === true;
                       handleSubtaskStatusChange({
-                        id: subtask.id,
+                        id: subtask.subtaskId,
                         changes: {
                           done,
                         },
@@ -149,7 +148,6 @@ export const TaskViewModal = () => {
               ))}
             </FieldGroup>
           </FieldSet>
-          {/* <FieldSet> */}
 
           <FieldGroup className="w-full max-w-xs mt-4">
             <Field orientation="vertical">
@@ -169,7 +167,6 @@ export const TaskViewModal = () => {
               </Select>
             </Field>
           </FieldGroup>
-          {/* </FieldSet> */}
         </CardContent>
       </Card>
     </div>

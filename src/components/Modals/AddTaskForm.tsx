@@ -50,7 +50,7 @@ const addTaskSchema = z.object({
   status: z.string().trim().min(1, 'Status is required'),
   subtasks: z.array(
     z.object({
-      id: z.string(),
+      subtaskId: z.string(),
       title: z.string().trim().min(1, 'Title is required').max(100, 'Title is too long'),
       done: z.boolean(),
     })
@@ -66,12 +66,12 @@ export const AddTaskForm = () => {
       status: '',
       subtasks: [
         {
-          id: nanoid(),
+          subtaskId: nanoid(),
           title: '',
           done: false,
         },
         {
-          id: nanoid(),
+          subtaskId: nanoid(),
           title: '',
           done: false,
         },
@@ -92,7 +92,7 @@ export const AddTaskForm = () => {
   function handleAddSubtask() {
     const subtaskId = nanoid();
     const nextSubtask: Subtask = {
-      id: subtaskId,
+      subtaskId,
       title: '',
       done: false,
       taskId: '',
@@ -101,7 +101,7 @@ export const AddTaskForm = () => {
   }
 
   function onSubmit(data: z.infer<typeof addTaskSchema>) {
-    const subtaskIds = data.subtasks.map(subtask => subtask.id);
+    const subtaskIds = data.subtasks.map(subtask => subtask.subtaskId);
     console.log(data);
 
     const column = columns.find(column => column.title === data.status);
@@ -119,10 +119,10 @@ export const AddTaskForm = () => {
     });
 
     const nextTask = {
-      id: taskId,
+      taskId,
       title: data.title,
       description: data.description,
-      columnId: column.id,
+      columnId: column.columnId,
       subtaskIds,
     };
 
