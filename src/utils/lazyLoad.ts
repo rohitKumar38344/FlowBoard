@@ -1,6 +1,6 @@
-import { lazy, type ComponentType } from 'react';
+import { lazy, type ComponentType, type PropsWithChildren } from 'react';
 
-type ReactComponent = ComponentType<unknown>;
+type ReactComponent = ComponentType<PropsWithChildren<unknown>>;
 
 export const lazyLoad = <T extends Record<string, unknown>>(
   path: () => Promise<T>,
