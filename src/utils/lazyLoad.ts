@@ -1,5 +1,5 @@
-import { lazy, type ComponentType, type PropsWithChildren } from 'react';
-
+import { lazy, type ComponentType } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ReactComponent = ComponentType<any>;
 
 export const lazyLoad = <T extends Record<string, unknown>>(
