@@ -8,13 +8,9 @@ import {
   selectActiveBoardColumnIds,
 } from '@/features/board/boardSlice';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { Suspense, type ReactNode } from 'react';
+import { Suspense } from 'react';
 
 import { useModal } from '@/hooks/useModal';
-const AddBoardModal = lazyLoad(() => import('../Modals/AddBoardModal'), 'AddBoardModal');
-const AddTaskForm = lazyLoad(() => import('../Modals/AddTaskForm'), 'AddTaskForm');
-const EditBoard = lazyLoad(() => import('../Modals/EditBoard'), 'EditBoard');
-const EditTaskModal = lazyLoad(() => import('../Modals/EditTaskModal'), 'EditTaskModal');
 const Modal = lazyLoad(() => import('../Modals/Modal'), 'Modal');
 
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
@@ -38,6 +34,10 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { lazyLoad } from '@/utils/lazyLoad';
+
+interface ModalComponentProps {
+  onClose: () => void;
+}
 export default function Layout() {
   const activeBoard = useAppSelector(selectActiveBoard);
   const columnIds = useAppSelector(selectActiveBoardColumnIds);
@@ -75,11 +75,11 @@ export default function Layout() {
     }
   }
 
-  const Modal_Components: Record<string, ReactNode> = {
-    ADD_BOARD: <AddBoardModal />,
-    EDIT_BOARD: <EditBoard />,
-    ADD_TASK: <AddTaskForm />,
-    EDIT_TASK: <EditTaskModal />,
+  const Modal_Components: Record<string, React.ComponentType<ModalComponentProps>> = {
+    ADD_BOARD: lazyLoad(() => import('../Modals/AddBoardModal'), 'AddBoardModal'),
+    EDIT_BOARD: lazyLoad(() => import('../Modals/EditBoard'), 'EditBoard'),
+    ADD_TASK: lazyLoad(() => import('../Modals/AddTaskForm'), 'AddTaskForm'),
+    EDIT_TASK: lazyLoad(() => import('../Modals/EditTaskModal'), 'EditTaskModal'),
   };
 
   return (
