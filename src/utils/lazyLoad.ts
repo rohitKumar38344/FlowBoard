@@ -25,3 +25,5 @@ export const lazyLoad = <T extends Record<string, unknown>>(
     throw new Error(`Module does not have a default or named export: ${String(namedExport)}`);
   });
 };
+
+export default lazyLoad;
