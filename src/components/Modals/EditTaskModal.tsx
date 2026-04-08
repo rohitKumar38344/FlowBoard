@@ -85,7 +85,6 @@ export const EditTaskModal = () => {
     name: 'subtasks',
   });
   function handleRemoveSubtask(index: number, subtaskId: string) {
-    console.log('subtaskid', subtaskId);
     remove(index);
     setSubtasksRemoved(prevRemovedSubtasks => [...prevRemovedSubtasks, subtaskId]);
   }
@@ -100,7 +99,6 @@ export const EditTaskModal = () => {
   }
 
   function onSubmit(data: z.infer<typeof editTaskSchema>) {
-    console.log('data', data);
     const nextColumn = columns.find(column => column.title === data.selectedColumn);
     if (!nextColumn) {
       console.error('Selected column not found');
@@ -250,7 +248,7 @@ export const EditTaskModal = () => {
                 )}
               />
               <Field>
-                <Button type="submit">Create Task</Button>
+                <Button type="submit">Save Changes</Button>
               </Field>
             </FieldSet>
           </FieldGroup>

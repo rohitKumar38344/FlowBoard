@@ -57,7 +57,7 @@ export const EditBoard = () => {
       columns: [...columns],
     },
   });
-  console.log('form defaults', form.getValues());
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'columns',

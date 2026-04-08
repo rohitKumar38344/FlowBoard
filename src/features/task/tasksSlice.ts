@@ -84,23 +84,18 @@ export const tasksSlice = createSlice({
       .addCase(boardUpdated, (state, action) => {
         const { removedColumns } = action.payload;
         const removedTaskds = removedColumns.map(rCol => rCol.taskIds).flat(1) as string[];
-        console.log('remTaskids', removedTaskds);
-        if (removedTaskds.length > 1) tasksAdapter.removeMany(state, removedTaskds);
+
+        if (removedTaskds.length > 0) tasksAdapter.removeMany(state, removedTaskds);
       });
   },
 });
 
 export default tasksSlice.reducer;
-// use selectAll from entityAdapter API
-// export const selectTaskEntites = (state: RootState) => state.tasks.entities;
-// use selectAll from entityAdapter API
+
 export const {
   selectAll: selectAllTasks,
   selectById: selectTaskById,
   selectEntities: selectTaskEntities,
 } = tasksAdapter.getSelectors((state: RootState) => state.tasks);
 
-// export const selectAllSubtaskIdsByTask = createSelector([selectColumnsByActiveBoard, selectAllTasks],(columns, tasks) => {
-
-// })
 export const { taskCreated, taskDeleted } = tasksSlice.actions;

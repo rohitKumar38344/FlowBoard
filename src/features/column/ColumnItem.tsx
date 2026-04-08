@@ -1,6 +1,6 @@
 import { useAppSelector } from '@/app/store/hooks';
 import { memo } from 'react';
-import { selectColumnsEntities } from './columnsSlice';
+import { selectColumnById, selectColumnsEntities } from './columnsSlice';
 import { TaskList } from '../task/TaskList';
 
 interface ColumnItemProps {
@@ -8,9 +8,8 @@ interface ColumnItemProps {
 }
 
 export const ColumnItem = memo(({ columnId }: ColumnItemProps) => {
-  const columns = useAppSelector(selectColumnsEntities);
-  const column = columns[columnId];
-  // console.log('column for columnId', column, columnId)
+  const column = useAppSelector(state => selectColumnById(state, columnId));
+
   const taskIds = column.taskIds;
   return (
     <div className="flex flex-col gap-4">

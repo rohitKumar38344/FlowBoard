@@ -43,7 +43,7 @@ export default function getStore() {
 
 // export const store = getStore(getKanbanData());
 export const store = getStore();
-// console.log('loaded state', store.getState())
+
 export type AppStore = typeof store;
 export type AppDispatch = AppStore['dispatch'];
 export type AppThunk<ThunkReturnType = void> = ThunkAction<

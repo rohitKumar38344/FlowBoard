@@ -51,7 +51,6 @@ export const TaskViewModal = () => {
   }
 
   function handleSubtaskStatusChange(nextSubtask: { id: string; changes: { done: boolean } }) {
-    console.log('nextsubtask', nextSubtask);
     dispatch(subtaskStatusUpdated(nextSubtask));
   }
 

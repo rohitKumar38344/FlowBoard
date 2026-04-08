@@ -67,9 +67,8 @@ export const boardSlice = createSlice({
     ) => {
       const { boardId } = action.payload;
       boardsAdapter.removeOne(state, boardId);
-      const nextActiveBoard = state.ids.pop();
+      const nextActiveBoard = state.ids.find(id => id !== boardId);
       if (nextActiveBoard) state.activeBoardId = nextActiveBoard;
-      else state.activeBoardId = '';
     },
   },
   extraReducers: builder => {

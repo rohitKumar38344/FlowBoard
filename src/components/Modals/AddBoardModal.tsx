@@ -83,17 +83,9 @@ export const AddBoardModal = () => {
         taskIds: [],
       })),
     };
-    // console.log('nextColumns', data.columns)
-    //     const nextColumns = data.columns.map(col => {
-    //       return {
-    //         ...col,
-    //         boardId: nextBoard.boardId,
-    //         taskIds: [],
-    //       };
-    //     });
 
     dispatch(boardCreated(nextBoard));
-    // dispatch(columnsAdded(nextColumns));
+
     closeModal();
   }
 

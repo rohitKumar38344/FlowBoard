@@ -87,7 +87,6 @@ export const selectColumnsEntities = (state: RootState) => state.columns.entitie
 export const selectColumnsByActiveBoard = createSelector(
   [selectActiveBoardId, selectColumnsEntities],
   (activeBoardId, entites) => {
-    console.log('activeboardid', activeBoardId);
     if (!activeBoardId) {
       return [];
     }

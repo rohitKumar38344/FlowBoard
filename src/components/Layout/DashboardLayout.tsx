@@ -68,7 +68,7 @@ export default function Layout() {
         subtaskIds.push(allSubtaskEntities[subtaskId].subtaskId);
       }
     }
-    // console.log('taskids', taskIds, subtaskIds);
+
     if (boardId) {
       navigate('/');
       dispatch(boardDeleted({ boardId, colIds, taskIds, subtaskIds }));
@@ -143,7 +143,12 @@ export default function Layout() {
       )}
       {activeModal && (
         <Suspense fallback={<LoadingSpinner />}>
-          <Modal onClose={closeModal}>{Modal_Components[activeModal]}</Modal>
+          <Modal onClose={closeModal}>
+            {(() => {
+              const ModalComponent = Modal_Components[activeModal];
+              return ModalComponent ? <ModalComponent onClose={closeModal} /> : null;
+            })()}
+          </Modal>
         </Suspense>
       )}
       <Toaster />

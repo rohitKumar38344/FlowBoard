@@ -102,7 +102,6 @@ export const AddTaskForm = () => {
 
   function onSubmit(data: z.infer<typeof addTaskSchema>) {
     const subtaskIds = data.subtasks.map(subtask => subtask.subtaskId);
-    console.log(data);
 
     const column = columns.find(column => column.title === data.status);
     if (!column) {

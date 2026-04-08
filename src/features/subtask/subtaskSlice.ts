@@ -44,7 +44,7 @@ export const subtaskSlice = createSlice({
     builder
       .addCase(taskUpdated, (state, action) => {
         const { subtasksRemoved, draftSubtasks } = action.payload;
-        console.log('subtasksRemoved', subtasksRemoved);
+
         subtasksAdapter.removeMany(state, subtasksRemoved);
         subtasksAdapter.upsertMany(state, draftSubtasks);
       })
