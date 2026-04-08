@@ -81,7 +81,7 @@ export default function Layout() {
     ADD_TASK: lazyLoad(() => import('../Modals/AddTaskForm'), 'AddTaskForm'),
     EDIT_TASK: lazyLoad(() => import('../Modals/EditTaskModal'), 'EditTaskModal'),
   };
-
+  console.log('dashboard', activeBoard);
   return (
     <div>
       {activeBoard ? (
@@ -90,7 +90,7 @@ export default function Layout() {
           <div className="flex flex-1 flex-col ">
             <header className="flex items-center justify-between p-4 relative">
               <SidebarTrigger />
-              <h1>{activeBoard.name}</h1>
+              <h1>{activeBoard?.name || ''}</h1>
 
               <div className="mr-12">
                 <Button onClick={() => openModal('ADD_TASK')}>+ Add New Task</Button>
@@ -115,7 +115,7 @@ export default function Layout() {
                         </AlertDialogMedia>
                         <AlertDialogTitle>Delete this Board?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          {` Are you sure you want to delete the "${activeBoard.name}" task and its subtasks? This action cannot be reversed.`}
+                          {` Are you sure you want to delete the "${activeBoard?.name}" task and its subtasks? This action cannot be reversed.`}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>

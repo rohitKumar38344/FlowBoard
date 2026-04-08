@@ -20,6 +20,7 @@ import { Button } from '../ui/button';
 import { XIcon } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { useNavigate } from 'react-router-dom';
 
 const addBoardSchema = z.object({
   name: z
@@ -44,6 +45,7 @@ const addBoardSchema = z.object({
 export const AddBoardModal = () => {
   const { closeModal } = useModal();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof addBoardSchema>>({
     resolver: zodResolver(addBoardSchema),
@@ -69,7 +71,6 @@ export const AddBoardModal = () => {
   });
 
   function onSubmit(data: z.infer<typeof addBoardSchema>) {
-    // const nextColumnIds = data.columns.map(column => column.columnId);
     const boardId = nanoid();
     const nextBoard = {
       board: {
@@ -83,7 +84,7 @@ export const AddBoardModal = () => {
         taskIds: [],
       })),
     };
-
+    navigate('/');
     dispatch(boardCreated(nextBoard));
 
     closeModal();

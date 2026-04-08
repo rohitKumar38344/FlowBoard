@@ -15,8 +15,8 @@ import { useModal } from '@/hooks/useModal';
 
 export function AppSidebar() {
   const boards = useAppSelector(selectAllBoards);
-  const dispatch = useAppDispatch();
   const { openModal } = useModal();
+  const dispatch = useAppDispatch();
   const renderBoards = Object.values(boards).map((board, index) => (
     <NavLink
       key={index}
@@ -46,11 +46,18 @@ export function AppSidebar() {
           <p>Flowboard</p>
         </SidebarHeader>
       </NavLink>
-      <h2 className="ml-2">ALL BOARDS ({renderBoards.length})</h2>
+      <h2 className="ml-2">
+        ALL BOARDS ({renderBoards.length}){' '}
+        {/* {activeBoardId === null && <span className="text-red-500"> - No board selected</span>} */}
+      </h2>
       <SidebarContent>
         <SidebarGroup>
           <ButtonGroup orientation={'vertical'} className="gap-2">
-            {renderBoards}
+            {renderBoards.length > 0 ? (
+              renderBoards
+            ) : (
+              <p className="text-sm text-gray-500">No boards available</p>
+            )}
             <Button className="w-full" onClick={() => openModal('ADD_BOARD')}>
               + Create New Board
             </Button>

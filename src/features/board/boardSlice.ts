@@ -30,7 +30,7 @@ export const boardSlice = createSlice({
     },
   }),
   reducers: {
-    boardSelected: (state, action: PayloadAction<string>) => {
+    boardSelected: (state, action) => {
       state.activeBoardId = action.payload;
     },
     boardCreated: (state, action) => {
@@ -78,7 +78,7 @@ export const boardSlice = createSlice({
   },
 });
 
-export const selectActiveBoardId = (state: RootState) => state.boards.activeBoardId ?? '';
+export const selectActiveBoardId = (state: RootState) => state.boards.activeBoardId;
 
 export const selectBoardEntities = (state: RootState) => state.boards.entities;
 
