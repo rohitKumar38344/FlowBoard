@@ -1,6 +1,6 @@
 import { useAppSelector } from '@/app/store/hooks';
 import { memo } from 'react';
-import { selectColumnById, selectColumnsEntities } from './columnsSlice';
+import { selectColumnById } from './columnsSlice';
 import { TaskList } from '../task/TaskList';
 
 interface ColumnItemProps {
