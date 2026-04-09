@@ -1,148 +1,103 @@
-# 🎯 FlowBoard
+# FlowBoard
 
-A modern, feature-rich kanban board application built with cutting-edge web technologies. Organize, manage, and track your tasks with a sleek drag-and-drop interface and persistent local storage.
+A Kanban board application for managing tasks across multiple projects. Create boards, organise work into columns, and track progress — all saved automatically to your browser's local storage with no account needed.
 
-## ✨ Features
+**[Live Demo →](https://boardwhiz.netlify.app/)** <!-- Replace with your actual Netlify URL -->
 
-### ✅ Currently Available
+![FlowBoard screenshot](./src/design/flowboard.png)
 
-- **Responsive UI** - Beautiful, modern interface built with React 19 and Tailwind CSS
-- **Form Management** - Robust form handling with React Hook Form and Zod validation
-- **State Management** - Efficient state management with Redux Toolkit
-- **UI Components** - Accessible components from Radix UI with shadcn styling
-- **Icons** - Beautiful icon set from Lucide React
-- **Notifications** - Toast notifications with Sonner
-- **Routing** - Seamless navigation with React Router DOM
-- **Code Quality** - ESLint and Prettier for consistent code formatting
+---
 
-### 🚀 Upcoming Features
+## Features
 
-- **🔄 Drag & Drop** - Intuitive drag-and-drop functionality (In Development)
-  - Reorder tasks within columns
-  - Move tasks between columns
-  - Smooth animations and visual feedback
-- **💾 Local Storage** - Persistent data storage (In Development)
-  - Auto-save functionality
-  - Data persistence across sessions
-  - Seamless data recovery
+- **Multiple boards** — create and switch between separate project boards
+- **Column management** — add, edit, and delete columns per board
+- **Task management** — create tasks with descriptions, subtasks, and status
+- **Subtask tracking** — mark subtasks complete and see progress on each task card
+- **Persistent storage** — all data auto-saved to localStorage, survives page refresh
+- **Form validation** — React Hook Form + Zod with real-time error feedback
+- **Fully responsive** — works on mobile, tablet, and desktop
+- **Accessible** — built on Radix UI primitives, keyboard navigable
 
-## 🛠️ Tech Stack
+---
 
-### Frontend Framework & UI
+## Tech Stack
 
-- **React 19.2** - Modern React with latest features
-- **TypeScript 5.9** - Type-safe development
-- **Vite 7.2** - Lightning-fast build tool with HMR
+| Category         | Technology                                 |
+| ---------------- | ------------------------------------------ |
+| Framework        | React 19 + TypeScript 5.9                  |
+| Build tool       | Vite 7                                     |
+| State management | Redux Toolkit 2 with `createEntityAdapter` |
+| Forms            | React Hook Form 7 + Zod 4                  |
+| UI components    | shadcn/ui (Radix UI primitives)            |
+| Styling          | Tailwind CSS 4                             |
+| Routing          | React Router DOM 7                         |
+| Notifications    | Sonner                                     |
+| Code quality     | ESLint, Prettier, Husky, Commitlint        |
 
-### State Management & Forms
+---
 
-- **Redux Toolkit 2.11** - Predictable state management
-- **React Redux 9.2** - React bindings for Redux
-- **React Hook Form 7.71** - Performant form handling
-- **Zod 4.3** - TypeScript-first schema validation
-- **@hookform/resolvers 5.2** - Form validation resolvers
+## Architecture
 
-### UI & Styling
+State is normalised using Redux Toolkit's `createEntityAdapter` across four slices — boards, columns, tasks, and subtasks. Each slice manages its own cleanup via `extraReducers`, so deleting a board cascades correctly through columns, tasks, and subtasks without a single monolithic action.
 
-- **Tailwind CSS 4.2** - Utility-first CSS framework
-- **Radix UI 1.4** - Unstyled, accessible components
-- **shadcn/ui** - Beautiful component library built on Radix UI
-- **Lucide React 0.577** - Consistent icon library
-- **Class Variance Authority 0.7** - CSS-in-JS for flexible styling
-- **clsx & tailwind-merge** - Utility functions for className management
+A custom localStorage middleware persists the full Redux state after every action and rehydrates it on load, giving the app full offline persistence with no backend.
 
-### Drag & Drop (Foundation Ready)
+---
 
-- **@dnd-kit/core 6.3** - Headless drag & drop library
-- **use-immer 0.11** - Immutable state updates
-
-### Additional Features
-
-- **React Router DOM 7.13** - Client-side routing
-- **Sonner 2.0** - Toast notifications
-- **@fontsource-variable/Geist 5.2** - Beautiful variable font
-
-### Development Tools
-
-- **ESLint 9.39** - Code linting with React-specific rules
-- **Prettier 3.8** - Code formatting
-- **TypeScript ESLint 8.46** - TypeScript linting
-- **Commitizen 4.3** - Conventional commits
-- **Husky 9.1** - Git hooks automation
-- **Commitlint 20.2** - Commit message linting
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js (v16 or higher)
-- npm or yarn package manager
-
-### Installation
+## Getting Started
 
 ```bash
-# Clone the repository
+# Clone the repo
 git clone https://github.com/rohitKumar38344/FlowBoard.git
 cd FlowBoard
 
 # Install dependencies
 npm install
-```
 
-### Development
-
-```bash
-# Start development server with hot module replacement
+# Start dev server
 npm run dev
-
-# The application will be available at http://localhost:5173
+# App runs at http://localhost:5173
 ```
 
-### Build
+**Other commands:**
 
 ```bash
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+npm run build      # production build
+npm run preview    # preview production build locally
+npm run lint       # run ESLint
+npm run format     # run Prettier
+npm run commit     # create a conventional commit with Commitizen
 ```
 
-### Code Quality
+---
+
+## Project Structure
+
+```
+src/
+├── app/store/          # Redux store configuration
+├── features/
+│   ├── board/          # Board slice + components
+│   ├── column/         # Column slice + components
+│   ├── task/           # Task slice + components
+│   └── subtask/        # Subtask slice + components
+├── components/
+│   ├── Modals/         # Add/Edit board and task modals
+│   ├── sidebar/        # App sidebar with board navigation
+│   └── ui/             # Reusable shadcn/ui components
+├── middlewares/        # localStorage persistence middleware
+├── hooks/              # Custom React hooks
+├── types/              # Shared TypeScript interfaces
+└── utils/              # localStorage save/load helpers
+```
+
+---
+
+## Git Workflow
+
+This project uses conventional commits enforced by Commitizen and Commitlint, with Husky running lint checks before every commit.
 
 ```bash
-# Lint code
-npm run lint
-
-# Format code with Prettier
-npm run format
-
-# Create conventional commit
-npm run commit
+npm run commit   # guided conventional commit prompt
 ```
-
-## 📊 Project Statistics
-
-- **Language Composition:**
-  - TypeScript: 96.3%
-  - CSS: 3%
-  - Other: 0.7%
-
-## 🎨 Architecture Highlights
-
-- **Type-Safe Development** - Full TypeScript support for catch errors at compile time
-- **Component-Based** - Modular architecture with reusable components
-- **Performance Optimized** - Vite's fast build times and optimized bundle size
-- **Accessible** - Built with Radix UI for WCAG compliance
-- **Scalable** - Redux Toolkit for predictable state management
-- **Developer Experience** - ESLint, Prettier, and Husky for code quality
-
-## 📝 Git Workflow
-
-This project uses conventional commits with Commitizen integration:
-
-```bash
-npm run commit
-```
-
-This ensures clean, readable commit history and automated changelog generation.
