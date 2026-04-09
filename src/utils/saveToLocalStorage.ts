@@ -2,11 +2,11 @@ import type { RootState } from '@/app/store/store';
 
 export const saveKanbanData = function (state: RootState) {
   const data = JSON.stringify(state);
-  localStorage.setItem('kanbanData', data);
+  localStorage.setItem('flowBoardData', data);
 };
 
 export const getKanbanData = function () {
-  const data = localStorage.getItem('kanban-data');
+  const data = localStorage.getItem('flowBoardData');
   if (!data) return initialFlowbardData;
   return JSON.parse(data);
 };
@@ -18,7 +18,7 @@ const initialFlowbardData: RootState = {
     entities: {
       b1: {
         boardId: 'b1',
-        name: 'Frontend Roadmap',
+        name: 'Frontend Roaffdmap',
         columnIds: ['c1', 'c2', 'c3'],
       },
       b2: {
