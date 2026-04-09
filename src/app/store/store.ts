@@ -18,8 +18,8 @@ export interface RootState {
   subtasks: EntityState<Subtask, string>;
 }
 
-// import { localStorageMiddleware } from "../middlewares/localStorageMiddleware";
-// import { getKanbanData } from "../utils/saveToLocalStorage";
+import { localStorageMiddleware } from '@/middlewares/localStorageMiddleware';
+import { getKanbanData } from '@/utils/saveToLocalStorage';
 
 const rootReducer = combineReducers({
   boards: boardsReducer,
@@ -33,16 +33,15 @@ export type AppState = ReturnType<typeof rootReducer>;
 export default function getStore() {
   const store = configureStore({
     reducer: rootReducer,
-    // preloadedState: incomingPreloadState,
-    // middleware: (getDefaultMiddleware) =>
-    //   getDefaultMiddleware().concat(localStorageMiddleware),
+    preloadedState: getKanbanData(),
+    middleware: getDefaultMiddleware => getDefaultMiddleware().concat(localStorageMiddleware),
   });
 
   return store;
 }
 
-// export const store = getStore(getKanbanData());
 export const store = getStore();
+// export const store = getStore();
 
 export type AppStore = typeof store;
 export type AppDispatch = AppStore['dispatch'];
