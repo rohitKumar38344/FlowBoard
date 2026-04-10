@@ -14,7 +14,7 @@ export const Board = () => {
   const columnIds = activeBoard.columnIds;
   return (
     <>
-      <div className="flex overflow-x-auto p-4 gap-4">
+      <div className="flex overflow-x-auto p-4 gap-4 h-screen">
         <ColumnList columnIds={columnIds} />
       </div>
       <Suspense fallback={<LoadingSpinner />}>

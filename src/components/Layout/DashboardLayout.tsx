@@ -81,7 +81,7 @@ export default function Layout() {
     ADD_TASK: lazyLoad(() => import('../Modals/AddTaskForm'), 'AddTaskForm'),
     EDIT_TASK: lazyLoad(() => import('../Modals/EditTaskModal'), 'EditTaskModal'),
   };
-  console.log('dashboard', activeBoard);
+
   return (
     <div>
       {activeBoard ? (
