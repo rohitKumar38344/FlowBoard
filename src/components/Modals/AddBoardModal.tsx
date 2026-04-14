@@ -22,7 +22,7 @@ import { Input } from '../ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import type { BoardCreatePayload } from '@/types';
+
 const addBoardSchema = z.object({
   name: z
     .string()
