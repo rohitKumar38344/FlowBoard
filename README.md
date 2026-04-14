@@ -2,7 +2,7 @@
 
 A Kanban board application for managing tasks across multiple projects. Create boards, organise work into columns, and track progress — all saved automatically to your browser's local storage with no account needed.
 
-**[Live Demo →](https://flow-board-eosin.vercel.app/)** <!-- Replace with your actual Netlify URL -->
+**[Live Demo →](https://flow-board-eosin.vercel.app/)**
 
 ![FlowBoard screenshot](./src/design/flowboard.png)
 
