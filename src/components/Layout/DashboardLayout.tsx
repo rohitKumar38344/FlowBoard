@@ -18,7 +18,7 @@ import { selectTaskEntities } from '@/features/task/tasksSlice';
 import { selectAllSubtasks } from '@/features/subtask/subtaskSlice';
 import { selectColumnsByActiveBoard } from '@/features/column/columnsSlice';
 import type { Task } from '@/types';
-import { Toaster } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -72,6 +72,7 @@ export default function Layout() {
     if (boardId) {
       navigate('/');
       dispatch(boardDeleted({ boardId, colIds, taskIds, subtaskIds }));
+      toast.success(`${activeBoard.name} deleted`);
     }
   }
 
@@ -151,7 +152,7 @@ export default function Layout() {
           </Modal>
         </Suspense>
       )}
-      <Toaster />
+      <Toaster richColors />
     </div>
   );
 }

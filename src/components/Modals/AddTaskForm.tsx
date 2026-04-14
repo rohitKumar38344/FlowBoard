@@ -128,20 +128,7 @@ export const AddTaskForm = () => {
     dispatch(taskCreated(nextTask));
     dispatch(subtasksAdded(nextSubtasksToAdd));
     closeModal();
-    toast('You submitted the following values:', {
-      description: (
-        <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-          <code>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-      position: 'bottom-right',
-      classNames: {
-        content: 'flex flex-col gap-2',
-      },
-      style: {
-        '--border-radius': 'calc(var(--radius)  + 4px)',
-      } as React.CSSProperties,
-    });
+    toast.success(`Task ${data.title} added`);
   }
   return (
     <Card className="px-4 py-4">

@@ -21,6 +21,7 @@ import { XIcon } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const addBoardSchema = z.object({
   name: z
@@ -86,7 +87,7 @@ export const AddBoardModal = () => {
     };
     navigate('/');
     dispatch(boardCreated(nextBoard));
-
+    toast.success(`Board ${data.name} create successfully`);
     closeModal();
   }
 

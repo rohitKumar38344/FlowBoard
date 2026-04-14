@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '../ui/alert-dialog';
+import { toast } from 'sonner';
 
 export const TaskViewModal = () => {
   const navigate = useNavigate();
@@ -66,6 +67,7 @@ export const TaskViewModal = () => {
         subtaskIds: task.subtaskIds,
       })
     );
+    toast.success(`Task ${task.title} deleted`);
     closeModal();
   }
 

@@ -39,6 +39,7 @@ import {
   InputGroupButton,
 } from '../ui/input-group';
 import { nanoid } from '@reduxjs/toolkit';
+import { toast } from 'sonner';
 
 const editTaskSchema = z.object({
   title: z
@@ -101,7 +102,7 @@ export const EditTaskModal = () => {
   function onSubmit(data: z.infer<typeof editTaskSchema>) {
     const nextColumn = columns.find(column => column.title === data.selectedColumn);
     if (!nextColumn) {
-      console.error('Selected column not found');
+      toast.error('Selected column not found');
       return;
     }
     const taskToUpdate = {
@@ -114,6 +115,7 @@ export const EditTaskModal = () => {
       nextColId: nextColumn.columnId,
     };
     dispatch(taskUpdated(taskToUpdate));
+    toast.success(`Task ${data.title} updated`);
     closeModal();
   }
   return (

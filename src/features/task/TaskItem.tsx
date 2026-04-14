@@ -44,6 +44,7 @@ export const TaskItem = memo(({ task }: TaskItemProps) => {
       draggable="true"
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      className="cursor-grab"
     >
       <Card>
         <CardHeader>

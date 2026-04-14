@@ -22,6 +22,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { nanoid } from '@reduxjs/toolkit';
 import type { DeletedColumnInfo } from '@/types';
 import { selectTaskEntities } from '@/features/task/tasksSlice';
+import { toast } from 'sonner';
 
 const editBoardSchema = z.object({
   name: z
@@ -102,6 +103,7 @@ export const EditBoard = () => {
     };
 
     dispatch(boardUpdated(nextBoard));
+    toast.success(`Board ${data.name} updated successfully`);
     closeModal();
   }
   return (
