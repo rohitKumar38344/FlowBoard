@@ -35,3 +35,17 @@ export interface DeletedColumnInfo {
 export interface DeletedSubtaskInfo {
   subtaskIds: string[];
 }
+
+export interface BoardCreatePayload {
+  board: {
+    boardId: string; // being added
+    name: string;
+    columnIds: string[]; // being added
+  };
+  columns: Array<{
+    columnId: string;
+    title: string;
+    boardId: string; // being added
+    taskIds: string[];
+  }>;
+}

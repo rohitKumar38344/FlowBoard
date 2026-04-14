@@ -1,9 +1,10 @@
 import type { RootState } from '@/app/store/store';
-import type { Board, DeletedColumnInfo } from '@/types';
+import type { Board, BoardCreatePayload, DeletedColumnInfo } from '@/types';
 import {
   createEntityAdapter,
   createSelector,
   createSlice,
+  nanoid,
   type PayloadAction,
 } from '@reduxjs/toolkit';
 import type { Column } from '@/types';
@@ -33,10 +34,28 @@ export const boardSlice = createSlice({
     boardSelected: (state, action) => {
       state.activeBoardId = action.payload;
     },
-    boardCreated: (state, action) => {
-      const { board } = action.payload;
+    boardCreated: {
+      reducer(state, action: PayloadAction<BoardCreatePayload>) {
+        const { board } = action.payload;
 
-      boardsAdapter.addOne(state, board);
+        boardsAdapter.addOne(state, board);
+      },
+      prepare(data: { name: string; columns: Array<{ columnId: string; title: string }> }) {
+        const boardId = nanoid();
+        const nextBoard: BoardCreatePayload = {
+          board: {
+            boardId,
+            name: data.name,
+            columnIds: data.columns.map(col => col.columnId),
+          },
+          columns: data.columns.map(col => ({
+            ...col,
+            boardId,
+            taskIds: [],
+          })),
+        };
+        return { payload: nextBoard };
+      },
     },
     boardUpdated: (
       state,
@@ -73,7 +92,7 @@ export const boardSlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(boardCreated, (state, action) => {
-      state.activeBoardId = action.payload.boardId;
+      state.activeBoardId = action.payload.board.boardId;
     });
   },
 });

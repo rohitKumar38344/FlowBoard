@@ -22,7 +22,7 @@ import { Input } from '../ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-
+import type { BoardCreatePayload } from '@/types';
 const addBoardSchema = z.object({
   name: z
     .string()
@@ -72,21 +72,8 @@ export const AddBoardModal = () => {
   });
 
   function onSubmit(data: z.infer<typeof addBoardSchema>) {
-    const boardId = nanoid();
-    const nextBoard = {
-      board: {
-        boardId,
-        name: data.name,
-        columnIds: data.columns.map(col => col.columnId),
-      },
-      columns: data.columns.map(col => ({
-        ...col,
-        boardId,
-        taskIds: [],
-      })),
-    };
     navigate('/');
-    dispatch(boardCreated(nextBoard));
+    dispatch(boardCreated(data));
     toast.success(`Board ${data.name} create successfully`);
     closeModal();
   }
