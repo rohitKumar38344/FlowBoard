@@ -57,7 +57,7 @@ export const ColumnItem = memo(({ columnId }: ColumnItemProps) => {
   }
   return (
     <div
-      className="flex flex-col gap-4 cursor-grab"
+      className="flex flex-col gap-4"
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}

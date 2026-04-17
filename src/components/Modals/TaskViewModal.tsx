@@ -127,7 +127,7 @@ export const TaskViewModal = () => {
                 <Field orientation="horizontal" key={subtask.subtaskId}>
                   <Checkbox
                     id={`${subtask.title}-${subtask.subtaskId}`}
-                    name={subtask.title}
+                    name={`${subtask.title}-${subtask.subtaskId}`}
                     defaultChecked={subtask.done}
                     onCheckedChange={checked => {
                       const done = checked === true;
@@ -140,7 +140,7 @@ export const TaskViewModal = () => {
                     }}
                   />
                   <FieldLabel
-                    htmlFor={`${subtask.title}-${subtask.id}`}
+                    htmlFor={`${subtask.title}-${subtask.subtaskId}`}
                     className={`font-normal ${subtask.done ? 'line-through' : ''}`}
                   >
                     {subtask.title}
